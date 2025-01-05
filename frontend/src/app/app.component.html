@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+</head>
+
+<body>
+    <h1>มา 4 จ่าย 3</h1>
+    <form (ngSubmit)="ok(masi.value)">
+        <input #masi type="number" placeholder="input me" name="masiValue">
+        <button type="submit">ok</button>
+    </form>
+
+    <h2>{{resoult}}</h2>
+
+    <!-- <button (click)="fetchData()">oooooo</button> -->
+    <div *ngFor="let user of data">
+        <h3>{{ user.name }}</h3>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Address:</strong>
+            {{ user.address.street }},
+            {{ user.address.suite }},
+            {{ user.address.city }},
+            {{ user.address.zipcode }}
+        </p>
+        <p><strong>Geo:</strong> Lat: {{ user.address.geo.lat }}, Lng: {{ user.address.geo.lng }}</p>
+        <p><strong>Phone:</strong> {{ user.phone }}</p>
+        <p><strong>Website:</strong> {{ user.website }}</p>
+        <p><strong>Company:</strong>
+            Name: {{ user.company.name }},
+            CatchPhrase: {{ user.company.catchPhrase }},
+            BS: {{ user.company.bs }}
+        </p>
+        <hr>
+    </div>
+
+</body>
+
+</html>
