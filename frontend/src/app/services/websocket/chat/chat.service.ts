@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Client, IMessage } from '@stomp/stompjs';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Message } from '../../../type';
 
 @Injectable({
   providedIn: 'root',
@@ -38,8 +39,8 @@ export class ChatService {
 
     this.stompClient.subscribe(`/room/${chatRoomId}`, (message: IMessage) => {
       console.log('Received message:', message.body);
-
-      const newMessage = JSON.parse(message.body); // แปลงข้อความเป็น object
+      
+      const newMessage : Message[] = JSON.parse(message.body); // แปลงข้อความเป็น object
       // เพิ่มข้อความใหม่ลงใน messagesSubject เพื่อให้แสดงใน chat
       this.messagesSubject.next([...this.messagesSubject.value, newMessage]);
     });

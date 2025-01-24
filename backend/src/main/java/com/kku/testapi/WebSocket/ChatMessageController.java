@@ -21,7 +21,7 @@ public class ChatMessageController {
     // WebSocket: ส่งข้อความใหม่และ Broadcast ให้ผู้ใช้ในห้อง
     @MessageMapping("/sendMessage/{chatRoomId}")
     @SendTo("/room/{chatRoomId}") // ส่งข้อความไปที่ /topic/room/{chatRoomId}
-    public MessageDto sendMessage(@DestinationVariable String chatRoomId, MessageDto messageDto) {
+    public Message sendMessage(@DestinationVariable String chatRoomId, MessageDto messageDto) {
         System.out.println("Message: " + messageDto.getContent() + " to room: " + chatRoomId);
 
         // ดึง ChatRoom ที่ตรงกับ chatRoomId
@@ -39,6 +39,6 @@ public class ChatMessageController {
         // บันทึกข้อความลงในฐานข้อมูล
         chatService.saveMessage(message);
 
-        return messageDto;
+        return message;
     }
 }

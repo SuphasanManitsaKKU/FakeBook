@@ -4,8 +4,15 @@
         <h3 class="text-lg font-semibold text-gray-700 mb-4">Friends</h3>
         <ul class="space-y-2">
             <li *ngFor="let friend of friends" (click)="selectFriend(friend.user.id)"
-                class="p-2 rounded-lg bg-gray-200 hover:bg-blue-200 cursor-pointer transition text-gray-700">
-                {{ friend.user.username }}
+                class="flex items-center gap-4 p-2 rounded-lg bg-gray-200 hover:bg-blue-200 cursor-pointer transition text-gray-700">
+                <!-- รูปโปรไฟล์ -->
+                <img
+                    [src]="friend.user.imageProfile || 'favicon.ico'"
+                    alt="{{ friend.user.username }}"
+                    class="w-10 h-10 rounded-full object-cover"
+                />
+                <!-- ชื่อผู้ใช้ -->
+                <span>{{ friend.user.username }}</span>
             </li>
         </ul>
         <div *ngIf="friends.length === 0" class="text-center text-gray-500 mt-4">
@@ -16,15 +23,22 @@
     <!-- Chat Window -->
     <div class="w-full md:w-3/4 bg-white p-4 rounded-lg shadow flex flex-col">
         <!-- Messages Area -->
-        <div class="flex-grow overflow-y-auto space-y-4 border-b pb-4" #scrollableArea>
-            <div *ngFor="let msg of chatMessages">
+        <div class="flex-grow overflow-y-auto flex flex-col-reverse space-y-reverse border-b pb-4">
+            <div *ngFor="let msg of chatMessages" class="flex">
                 <div [ngClass]="{
-                    'self-end bg-blue-500 text-white': msg.senderId === currentUserId,
-                    'self-start bg-gray-200 text-gray-700': msg.senderId !== currentUserId
-                }" class="max-w-full break-words p-3 rounded-lg shadow text-sm">
-                    {{ msg.content }}
+                        'ml-auto bg-blue-500 text-white': msg.sender.id == currentUserId,
+                        'mr-auto bg-gray-200 text-gray-700': msg.sender.id != currentUserId
+                    }" class="max-w-[75%] break-words p-3 rounded-lg shadow text-sm m-2">
+                    <!-- แสดงข้อความ -->
+                    <div>{{ msg.content }}</div>
+                    
+                    <!-- แสดงวันที่และเวลา -->
+                    <div class="text-xs text-gray-400 mt-1 text-right" *ngIf="msg.timestamp">
+                        {{ msg.timestamp | date: 'HH:mm dd/MM/yyyy' }}
+                    </div>
                 </div>
             </div>
+
             <div *ngIf="chatMessages.length === 0" class="text-center text-gray-500 mt-4">
                 <p>No messages yet. Say hi!</p>
             </div>
@@ -41,6 +55,7 @@
         </form>
     </div>
 </div>
+
 
 
 <!-- Loading Indicator -->

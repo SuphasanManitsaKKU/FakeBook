@@ -4,6 +4,7 @@ import { ChatService } from '../../services/websocket/chat/chat.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user/user.service';
+import { Friend, Message } from '../../type';
 
 @Component({
     selector: 'app-chat',
@@ -12,11 +13,10 @@ import { UserService } from '../../services/user/user.service';
     styleUrls: ['./chat.component.css'],
 })
 export class ChatComponent implements OnInit {
-    @ViewChild('scrollableArea') scrollableArea!: ElementRef;
-    friends: any[] = [];
-    chatMessages: any[] = [];
+    friends: Friend[] = [];
+    chatMessages: Message[] = [];
     currentChatRoomId!: number;
-    currentUserId = 1; // Mock user ID
+    currentUserId = 0; // Mock user ID
     message = '';
     isLoading = false; // ตัวแปรสำหรับแสดง Loading
     errorMessage = ''; // ตัวแปรสำหรับข้อความ Error
@@ -52,7 +52,10 @@ export class ChatComponent implements OnInit {
                 // โหลดข้อความเก่า
                 this.authService.getMessages(this.currentChatRoomId).subscribe({
                     next: (messages) => {
-                        this.chatMessages = messages;
+                        console.log('---1');
+
+                        this.chatMessages = messages.reverse();
+
                         this.isLoading = false;
                     },
                     error: (err) => {
@@ -67,8 +70,17 @@ export class ChatComponent implements OnInit {
 
                 // Subscribe to messages$ observable
                 this.chatService.messages$.subscribe((messages) => {
-                    this.chatMessages = messages;  // Update chatMessages when messages change
+                    console.log('---2', messages, "---2");
+                
+                    // กรองข้อความที่ยังไม่มีใน this.chatMessages
+                    const newMessages = messages.filter(
+                        (msg) => !this.chatMessages.some((existingMsg) => existingMsg.id === msg.id)
+                    );
+                
+                    // อัปเดต chatMessages โดยเพิ่มเฉพาะข้อความใหม่
+                    this.chatMessages = [...newMessages, ...this.chatMessages];
                 });
+                
             },
             error: (err) => {
                 console.error('Error creating or fetching chat room:', err);
@@ -84,13 +96,4 @@ export class ChatComponent implements OnInit {
             this.message = ''; // ล้างข้อความในช่องป้อนข้อมูล
         }
     }
-
-    scrollToBottom(): void {
-        try {
-          const scrollArea = this.scrollableArea.nativeElement;
-          scrollArea.scrollTop = scrollArea.scrollHeight;
-        } catch (err) {
-          console.error('Scroll to bottom failed:', err);
-        }
-      }
 }

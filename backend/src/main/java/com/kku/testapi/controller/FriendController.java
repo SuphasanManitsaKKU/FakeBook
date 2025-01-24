@@ -22,7 +22,6 @@ public class FriendController {
         this.friendService = friendService;
     }
 
-    // GET: /api/friends - Get all friends
     @GetMapping("/getAllFriends")
     public ResponseEntity<List<FriendDto>> getAllFriends(@RequestParam Integer id) {
         List<FriendDto> friends = friendService.findFriendsByUserId(id);
