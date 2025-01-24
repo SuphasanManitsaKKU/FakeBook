@@ -12,10 +12,20 @@ import com.kku.testapi.Util.JwtUtil;
 public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String token = null;
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
+        String requestURI = request.getRequestURI();
 
-        // ดึง JWT จาก Cookie
+        // อนุญาตเฉพาะ URL ที่ระบุ โดยไม่ต้องตรวจสอบ JWT
+        if (requestURI.equals("/api/login") ||
+                requestURI.equals("/api/register") ||
+                requestURI.equals("/api/logout") ||
+                requestURI.equals("/api")) {
+            return true;
+        }
+
+        // ตรวจสอบ JWT สำหรับเส้นทางอื่นๆ
+        String token = null;
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("token".equals(cookie.getName())) {
@@ -32,8 +42,8 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
 
         try {
-            String username = JwtUtil.getUsernameFromToken(token); // ตรวจสอบ JWT
-            request.setAttribute("username", username); // เก็บ username เพื่อใช้งาน
+            String username = JwtUtil.getUsernameFromToken(token);
+            request.setAttribute("username", username);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Unauthorized: Invalid token");

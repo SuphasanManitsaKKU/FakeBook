@@ -1,13 +1,15 @@
 package com.kku.testapi.service;
 
 
+import java.util.List;
+
 import com.kku.testapi.entity.User;
 
 public interface UserService {
-    String login(String username, String password);
+    User login(String username, String password);
     String register(User user);
+    List<User> searchByUsername(String username); // คืนค่าเป็น List<User>
     // User save(User user);
-    // List<User> findAll();
     // User findById(int id);
     // User update(User user);
     // void deleteById(int id);

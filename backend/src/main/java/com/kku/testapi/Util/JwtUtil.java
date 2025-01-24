@@ -17,9 +17,10 @@ private static final SecretKey KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(S
     private static final long EXPIRATION_TIME = 86400000; // 1 day
 
     // Generate JWT Token
-    public static String generateToken(String username) {
+    public static String generateToken(String userId, String username) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(username) // Use username as the subject
+                .claim("userId", userId) // Add userId as a custom claim
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(KEY) // Use the secure key

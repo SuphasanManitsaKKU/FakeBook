@@ -1,18 +1,31 @@
 package com.kku.testapi.controller;
 
+import com.kku.testapi.Util.JwtUtil;
 import com.kku.testapi.entity.User;
 import com.kku.testapi.service.UserService;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
 public class UserController {
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    @GetMapping("/sendNotification")
+    public String sendNotification(@RequestBody NotificationRequest request) {
+        messagingTemplate.convertAndSend("/notification/messages/" + request.getUserId(), request.getMessage());
+        return request.getUserId() + " : " + request.getMessage();
+    }
 
     private UserService userService;
 
@@ -20,21 +33,22 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public String home() {
         return "Hello World";
     }
 
     @GetMapping("/test")
     public String fff() {
-        return "Hello World-----------------";
+        return "Hello World test";
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
-        System.out.println("--------------------------------------------------1");
-        String token = this.userService.login(user.getUsername(), user.getPassword());
-        System.out.println("--------------------------------------------------2");
+        User userLogin = this.userService.login(user.getUsername(), user.getPassword());
+        // สร้าง JWT Token
+        String token = JwtUtil.generateToken(String.valueOf(userLogin.getId()), userLogin.getUsername());
+
         // สร้าง Cookie สำหรับ JWT
         ResponseCookie jwtCookie = ResponseCookie.from("token", token)
                 // .httpOnly(true) // ป้องกันการเข้าถึงจาก JavaScript
@@ -42,14 +56,14 @@ public class UserController {
                 .path("/")
                 .maxAge(24 * 60 * 60) // อายุ 1 วัน
                 .build();
-        System.out.println("--------------------------------------------------3");
+
         // ส่ง Response พร้อม Cookie
         return ResponseEntity.ok()
                 .header("Set-Cookie", jwtCookie.toString())
                 .body(Map.of("message", "Login successful"));
     }
 
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     public ResponseEntity<?> logout() {
         // สร้าง Cookie สำหรับลบ JWT
         ResponseCookie jwtCookie = ResponseCookie.from("token", "")
@@ -67,36 +81,39 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public String register(@RequestBody User user) {
-        System.out.println("--------------------------------------------------");
-        return this.userService.register(user);
+    public ResponseEntity<Map<String, String>> register(@RequestBody User user) {
+        this.userService.register(user);
+
+        // ส่งคำตอบกลับในรูปแบบ JSON
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "User registered successfully.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // @PostMapping("/user")
-    // public User addUser(@RequestBody User user) {
-    // user.setId(0);
-    // return this.userService.save(user);
-    // }
+    @GetMapping("/users/search")
+    public List<User> searchUsers(@RequestParam String username) {
+        return userService.searchByUsername(username);
+    }
+}
 
-    // @GetMapping("/user")
-    // public List<User> getAllUser() {
-    // return this.userService.findAll();
-    // }
+class NotificationRequest {
+    private String userId;
+    private String message;
 
-    // @GetMapping("/user/{id}")
-    // public User getUserById(@PathVariable int id) {
-    // return this.userService.findById(id);
-    // }
+    // Getters และ Setters
+    public String getUserId() {
+        return userId;
+    }
 
-    // @PutMapping("/user")
-    // public User updateUser(@RequestBody User user) {
-    // return this.userService.update(user);
-    // }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-    // @DeleteMapping("/user/{id}")
-    // public String deleteUserById(@PathVariable int id) {
-    // this.userService.deleteById(id);
-    // return "Deleted user id: " + id;
-    // }
+    public String getMessage() {
+        return message;
+    }
 
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

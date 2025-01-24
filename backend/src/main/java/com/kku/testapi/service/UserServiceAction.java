@@ -1,9 +1,11 @@
 package com.kku.testapi.service;
 
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.kku.testapi.Util.JwtUtil;
 import com.kku.testapi.entity.User;
 import com.kku.testapi.repository.UserRepository;
 
@@ -17,13 +19,12 @@ public class UserServiceAction implements UserService {
     }
 
     @Override
-    public String login(String username, String password) {
+    public User login(String username, String password) {
         User user = userRepository.findByUsername(username);
         if (user != null) {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             if (passwordEncoder.matches(password, user.getPassword())) {
-                // สร้าง JWT Token
-                return JwtUtil.generateToken(username);
+                return user;
             }
         }
         throw new RuntimeException("Invalid username or password");
@@ -31,7 +32,6 @@ public class UserServiceAction implements UserService {
 
     @Override
     public String register(User user) {
-        System.out.println("--------------------------------------------------");
         // ตรวจสอบว่าชื่อผู้ใช้ซ้ำหรือไม่
         if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new RuntimeException("Username already exists");
@@ -51,5 +51,10 @@ public class UserServiceAction implements UserService {
         userRepository.save(user);
 
         return "Register success";
+    }
+
+    @Override
+    public List<User> searchByUsername(String username) {
+        return userRepository.findByUsernameContainingIgnoreCase(username);
     }
 }
