@@ -1,0 +1,9 @@
+<div>
+    <h1>Posts</h1>
+    <div *ngFor="let post of posts">
+        <p>{{ post.content }}</p>
+        <app-comment [postId]="post.id"></app-comment>
+    </div>
+    <input [(ngModel)]="newPostContent" placeholder="Create new post" />
+    <button (click)="createPost()">Create Post</button>
+</div>

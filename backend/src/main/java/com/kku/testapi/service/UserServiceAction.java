@@ -57,4 +57,11 @@ public class UserServiceAction implements UserService {
     public List<User> searchByUsername(String username) {
         return userRepository.findByUsernameContainingIgnoreCase(username);
     }
+
+    // Implement getUserById
+    @Override
+    public User getUserById(Integer id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+    }
 }

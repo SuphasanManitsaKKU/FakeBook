@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Post } from '../../type';
+import { Comment } from '../../type';
 
 @Injectable({
     providedIn: 'root'
@@ -30,7 +32,7 @@ export class AuthService {
 
     getOrCreateChatRoom(userOneId: number, userTwoId: number): Observable<any> {
         console.log(userOneId, userTwoId);
-        
+
         return this.http.get(`${this.apiUrl}/api/chat/room?userOneId=${userOneId}&userTwoId=${userTwoId}`, { withCredentials: true });
     }
 
@@ -38,7 +40,19 @@ export class AuthService {
         return this.http.get(`${this.apiUrl}/api/chat/messages?chatRoomId=${chatRoomId}`, { withCredentials: true });
     }
 
-    // sendMessage(chatRoomId: number, senderId: number, content: string): Observable<any> {
-    //     return this.http.post(`${this.apiUrl}/api/chat/send`, { chatRoomId, senderId, content }, { withCredentials: true });
-    // }
+    getPosts(): Observable<Post[]> {
+        return this.http.get<Post[]>(this.apiUrl);
+    }
+
+    createPost(post: Post): Observable<Post> {
+        return this.http.post<Post>(this.apiUrl, post);
+    }
+
+    getComments(postId: number): Observable<Comment[]> {
+        return this.http.get<Comment[]>(`${this.apiUrl}/post/${postId}`);
+    }
+
+    createComment(id: number, comment: Comment): Observable<Comment> {
+        return this.http.post<Comment>(this.apiUrl, comment);
+    }
 }

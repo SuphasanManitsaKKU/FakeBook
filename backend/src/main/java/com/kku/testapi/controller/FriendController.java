@@ -13,7 +13,7 @@ import com.kku.testapi.dto.FriendDto;
 import com.kku.testapi.service.FriendServiceAction;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/friends")
 public class FriendController {
     private final FriendServiceAction friendService;
 

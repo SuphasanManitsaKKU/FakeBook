@@ -32,3 +32,21 @@ export interface Message {
     content: string;
     timestamp: string; // ใช้เป็น string เนื่องจาก timestamp มาในรูปแบบ ISO-8601
 }
+
+export interface Post {
+    id: number;
+    content: string;
+    likeAmount: number;
+    commentAmount: number;
+    shareAmount: number;
+    userId: number;
+    comments: Comment[];
+}
+
+export interface Comment {
+    id: number;
+    message: string;
+    postId: number;
+    userId: number;
+    parentCommentId?: number;
+}

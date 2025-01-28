@@ -9,7 +9,6 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String message;
 
     @ManyToOne
@@ -19,6 +18,10 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment; 
 
     // Getters and Setters
 
