@@ -1,9 +1,7 @@
 package com.kku.testapi.service;
 
 import com.kku.testapi.dto.PostResponseDTO;
-import com.kku.testapi.entity.Comment;
 import com.kku.testapi.entity.Post;
-import com.kku.testapi.entity.Share;
 import com.kku.testapi.entity.User;
 import com.kku.testapi.repository.CommentRepository;
 import com.kku.testapi.repository.LikeRepository;

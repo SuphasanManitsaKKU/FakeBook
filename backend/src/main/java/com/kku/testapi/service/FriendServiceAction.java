@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.kku.testapi.dto.FriendDto;
 import com.kku.testapi.entity.Friend;
 import com.kku.testapi.entity.User;
 import com.kku.testapi.repository.FriendRepository;
