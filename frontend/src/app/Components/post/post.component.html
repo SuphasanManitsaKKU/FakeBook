@@ -1,9 +1,72 @@
-<div>
-    <h1>Posts</h1>
-    <div *ngFor="let post of posts">
-        <p>{{ post.content }}</p>
-        <app-comment [postId]="post.id"></app-comment>
+<div class="bg-white rounded-lg shadow-lg p-6 mb-4">
+  <div class="post-header mb-4 flex justify-between items-center">
+    <div class="flex items-center cursor-pointer" (click)="navigateToUser()">
+      <!-- รูปโปรไฟล์ผู้โพสต์ -->
+      <img
+        [src]="post?.user?.imageProfile ?? 'default-profile.png'"
+        alt="Profile Image"
+        class="w-12 h-12 rounded-full mr-3 hover:opacity-80 transition"
+      />
+      <div>
+        <p class="text-lg font-semibold hover:underline">{{ post?.user?.username }}</p>
+        <p class="text-sm text-gray-500">{{ post?.timestamp | date:'medium' }}</p>
+      </div>
     </div>
-    <input [(ngModel)]="newPostContent" placeholder="Create new post" />
-    <button (click)="createPost()">Create Post</button>
+
+    <!-- เมนูจุดสามจุด -->
+    <div class="relative">
+      <button class="text-gray-600 hover:text-gray-800 p-2" (click)="togglePostMenu()">
+        &#x22EE;
+      </button>
+      <div *ngIf="showPostMenu" class="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-50">
+        <button class="block w-full text-left px-4 py-2 text-yellow-500 hover:bg-gray-100" (click)="startEdit()">✏️ แก้ไข</button>
+        <button class="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100" (click)="deletePost()">🗑️ ลบ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ฟอร์มแก้ไขโพสต์ -->
+  <div *ngIf="editing">
+    <textarea [(ngModel)]="editedContent" class="w-full p-2 border rounded-md"></textarea>
+    <div class="flex gap-2 mt-2">
+      <button class="bg-green-500 text-white py-1 px-2 rounded-md" (click)="saveEdit()">บันทึก</button>
+      <button class="text-gray-500" (click)="cancelEdit()">ยกเลิก</button>
+    </div>
+  </div>
+
+  <!-- แสดงเนื้อหาโพสต์ -->
+  <div *ngIf="!editing">
+    <p class="text-lg text-gray-700">{{ post?.content }}</p>
+  </div>
+
+  <div class="post-actions flex gap-4 mt-4">
+    <button class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600" (click)="toggleLike()">
+      ไดค์ ({{ post?.likeAmount }})
+    </button>
+    <button class="bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600" (click)="toggleComments()">
+      แสดงความคิดเห็น ({{ post?.commentAmount }})
+    </button>
+
+    <!-- ปุ่มแชร์ -->
+    <div class="relative">
+      <button class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600" (click)="toggleShareOptions()">
+        แชร์ ({{ post?.shareAmount }})
+      </button>
+      <div *ngIf="showShareOptions" class="absolute bg-white border rounded-md mt-2 shadow-lg p-2 z-50">
+        <button class="block w-52 text-left px-2 py-2 hover:bg-gray-200" (click)="copyLink()">📋 คัดลอกลิงก์</button>
+        <button class="block w-52 text-left px-2 py-2 hover:bg-gray-200" (click)="shareToFeed()">📢 แชร์ไปที่ Feed</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ส่วนแสดงคอมเมนต์ -->
+  <div class="post-comments" *ngIf="showComments">
+    <!-- เรียก <app-comment> และผูก (commentAdded) กับฟังก์ชันใน PostComponent -->
+      <app-comment
+      [postId]="postId"
+      (commentAdded)="onCommentChange()"
+      (commentDeleted)="onCommentChange()"
+    ></app-comment>
+    
+  </div>
 </div>

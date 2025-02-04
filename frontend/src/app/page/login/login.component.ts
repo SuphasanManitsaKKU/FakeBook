@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth/auth.service';
+import { UserService } from '../../services/auth/user/user.service';
 
 @Component({
     selector: 'app-login',
@@ -18,12 +18,12 @@ export class LoginComponent {
     errorMessage: string = '';
 
     constructor(
-        private authService: AuthService, // Inject AuthService
+        private userService: UserService, // Inject AuthService
         private router: Router
     ) { }
 
     login(): void {
-        this.authService.login(this.username, this.password).subscribe(
+        this.userService.login(this.username, this.password).subscribe(
             (response) => {
                 console.log('Login successful:', response);
 

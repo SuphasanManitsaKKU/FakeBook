@@ -1,10 +1,12 @@
-import { AuthService } from './../../services/auth/auth.service';
+import { FriendService } from './../../services/auth/friend/friend.service';
+import { UserService } from '../../services/auth/user/user.service';
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { ChatService } from '../../services/websocket/chat/chat.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UserService } from '../../services/user/user.service';
-import { Friend, Message } from '../../type';
+import { UserPublicService } from '../../services/userPublic/userPublic.service';
+import { User, Message } from '../../type';
+import { ChatRoomService } from '../../services/auth/chatRoom/chatRoom.service';
 
 @Component({
     selector: 'app-chat',
@@ -13,7 +15,7 @@ import { Friend, Message } from '../../type';
     styleUrls: ['./chat.component.css'],
 })
 export class ChatComponent implements OnInit {
-    friends: Friend[] = [];
+    friends: User[] = [];
     chatMessages: Message[] = [];
     currentChatRoomId!: number;
     currentUserId = 0; // Mock user ID
@@ -21,14 +23,14 @@ export class ChatComponent implements OnInit {
     isLoading = false; // ตัวแปรสำหรับแสดง Loading
     errorMessage = ''; // ตัวแปรสำหรับข้อความ Error
 
-    constructor(private chatService: ChatService, private authService: AuthService, private userService: UserService) { }
+    constructor(private chatService: ChatService, private chatRoomService: ChatRoomService,private friendService: FriendService,private userService: UserService, private userPublicService: UserPublicService) { }
 
     ngOnInit(): void {
-        this.currentUserId = this.userService.getUserId();
+        this.currentUserId = this.userPublicService.getUserId();
 
         // เรียก API เพื่อดึงข้อมูลเพื่อน
         this.isLoading = true;
-        this.authService.getAllFriends(this.currentUserId).subscribe({
+        this.friendService.getAllFriends(this.currentUserId).subscribe({
             next: (friends) => {
                 this.friends = friends; // ตั้งค่ารายชื่อเพื่อน
                 this.isLoading = false;
@@ -45,12 +47,12 @@ export class ChatComponent implements OnInit {
         this.isLoading = true;
         this.errorMessage = '';
 
-        this.authService.getOrCreateChatRoom(this.currentUserId, friendId).subscribe({
+        this.chatRoomService.getOrCreateChatRoom(this.currentUserId, friendId).subscribe({
             next: (chatRoom) => {
                 this.currentChatRoomId = chatRoom.id;
 
                 // โหลดข้อความเก่า
-                this.authService.getMessages(this.currentChatRoomId).subscribe({
+                this.chatRoomService.getMessages(this.currentChatRoomId).subscribe({
                     next: (messages) => {
                         console.log('---1');
 

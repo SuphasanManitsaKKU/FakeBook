@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class UserPublicService {
   private userId: number = 0; // ตัวแปรสำหรับเก็บ userId
   private username: string = ''; // ตัวแปรสำหรับเก็บ username
 

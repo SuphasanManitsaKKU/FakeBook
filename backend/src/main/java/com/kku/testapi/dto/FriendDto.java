@@ -4,11 +4,14 @@ import com.kku.testapi.entity.User;
 
 public class FriendDto {
     private Integer id;
-    private User user;
+    private String username;
+    private String email;
 
-    public FriendDto(Integer id, User user) {
-        this.id = id;
-        this.user = user;
+    // ✅ Constructor ที่รับ `User` เป็นพารามิเตอร์
+    public FriendDto(User user) {
+        this.id = user.getId();
+        this.username = user.getUsername(); // สมมติว่า `User` มีฟิลด์ `username`
+        this.email = user.getEmail(); // สมมติว่า `User` มีฟิลด์ `email`
     }
 
     // Getters and Setters
@@ -20,11 +23,19 @@ public class FriendDto {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

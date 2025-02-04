@@ -1,15 +1,18 @@
 package com.kku.testapi.service;
 
+import com.kku.testapi.dto.PostResponseDTO;
 import com.kku.testapi.entity.Comment;
-import com.kku.testapi.entity.Friend;
 import com.kku.testapi.entity.Post;
 import com.kku.testapi.entity.Share;
 import com.kku.testapi.entity.User;
 import com.kku.testapi.repository.CommentRepository;
-import com.kku.testapi.repository.FriendRepository;
+import com.kku.testapi.repository.LikeRepository;
 import com.kku.testapi.repository.PostRepository;
 import com.kku.testapi.repository.ShareRepository;
 import com.kku.testapi.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +29,18 @@ public class PostService {
     private UserRepository userRepository;
 
     @Autowired
-    private FriendRepository friendRepository;
-
-    @Autowired
     private CommentRepository commentRepository;
 
     @Autowired
     private ShareRepository shareRepository;
+
+    @Autowired
+    private LikeRepository likeRepository;
+
+    public Post getPostEntityById(Integer id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
+    }
 
     // Get all posts
     public List<Post> getAllPosts() {
@@ -40,9 +48,22 @@ public class PostService {
     }
 
     // Get post by ID
-    public Post getPostById(Integer id) {
-        return postRepository.findById(id)
+    public PostResponseDTO getPostById(Integer id) {
+        Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
+
+        int likeAmount = likeRepository.countByPostId(id);
+        int commentAmount = commentRepository.countByPostId(id);
+        int shareAmount = shareRepository.countByPostId(id);
+
+        return new PostResponseDTO(
+                post.getId(),
+                post.getContent(),
+                post.getUser(), // ✅ ใช้ `User` แทน `userId`
+                post.getTimestamp(),
+                likeAmount,
+                commentAmount,
+                shareAmount);
     }
 
     // Create a new post
@@ -54,46 +75,63 @@ public class PostService {
     public Post updatePost(Integer id, Post updatedPost) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
-
-        existingPost.setContent(updatedPost.getContent());
-        existingPost.setCommentAmount(updatedPost.getCommentAmount());
-        existingPost.setLikeAmount(updatedPost.getLikeAmount());
-        existingPost.setShareAmount(updatedPost.getShareAmount());
-
         return postRepository.save(existingPost);
     }
 
-    // Delete a post
-    public void deletePost(Integer id) {
-        if (!postRepository.existsById(id)) {
-            throw new IllegalArgumentException("Post not found with ID: " + id);
-        }
-
-        // ลบ Comments ที่เกี่ยวข้องกับโพสต์
-        List<Comment> comments = commentRepository.findByPostId(id);
-        commentRepository.deleteAll(comments);
-
-        // ลบ Shares ที่เกี่ยวข้องกับโพสต์
-        List<Share> shares = shareRepository.findByPostId(id);
-        shareRepository.deleteAll(shares);
-
-        // ลบโพสต์
-        postRepository.deleteById(id);
+    public PostResponseDTO convertToPostResponseDTO(Post post) {
+        return new PostResponseDTO(
+                post.getId(),
+                post.getContent(),
+                post.getUser(), // ✅ ใช้ `User` ตรงๆ
+                post.getTimestamp(),
+                likeRepository.countByPostId(post.getId()),
+                commentRepository.countByPostId(post.getId()),
+                shareRepository.countByPostId(post.getId()));
     }
 
-    public List<Post> getFriendsPosts(Integer userId) {
+    // Delete a post
+    @Transactional
+    public void deletePost(Integer postId) {
+        System.out.println("------------------------------1");
+        // 🔹 ตรวจสอบว่าโพสต์มีอยู่จริงหรือไม่
+        Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        
+        System.out.println("------------------------------2");
+        // 🔹 ลบไลก์ที่เกี่ยวข้องก่อน
+        likeRepository.deleteByPostId(postId);
+        
+        System.out.println("------------------------------3");
+        // 🔹 ลบคอมเมนต์ทั้งหมดที่เกี่ยวข้อง
+        commentRepository.deleteByPostId(postId);
+        
+        System.out.println("------------------------------4");
+        // 🔹 ลบแชร์ที่เกี่ยวข้อง (ถ้ามีระบบแชร์)
+        shareRepository.deleteByPostId(postId);
+        
+        System.out.println("------------------------------5");
+        // 🔹 ลบโพสต์
+        postRepository.delete(post);
+        System.out.println("------------------------------6");
+    }
+
+    @Transactional
+    public List<PostResponseDTO> getUserAndFriendsPosts(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
-        // ดึงข้อมูลเพื่อนของผู้ใช้งาน
-        List<Friend> friends = friendRepository.findByUserOneOrUserTwo(user, user);
+        List<User> friends = userRepository.findFriendsByUserId(userId);
+        friends.add(user); // รวมโพสต์ของตัวเองด้วย
 
-        // แปลง `Friend` เป็น `User`
-        List<User> friendUsers = friends.stream()
-                .map(friend -> friend.getUserOne().equals(user) ? friend.getUserTwo() : friend.getUserOne())
-                .collect(Collectors.toList());
+        List<Post> posts = postRepository.findByUserIn(friends);
 
-        // ดึงโพสต์ของเพื่อน
-        return postRepository.findByUserIn(friendUsers);
+        return posts.stream().map(post -> new PostResponseDTO(
+                post.getId(),
+                post.getContent(),
+                post.getUser(),
+                post.getTimestamp(),
+                likeRepository.countByPostId(post.getId()),
+                commentRepository.countByPostId(post.getId()),
+                shareRepository.countByPostId(post.getId()))).collect(Collectors.toList());
     }
 }

@@ -11,15 +11,11 @@ public class User {
     private Integer id;
 
     private String email;
-
     private String imageProfile;
-
     private String password;
-
     private String username;
 
     // Getters and Setters
-
     public Integer getId() {
         return id;
     }

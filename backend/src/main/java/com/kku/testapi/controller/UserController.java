@@ -1,6 +1,7 @@
 package com.kku.testapi.controller;
 
 import com.kku.testapi.Util.JwtUtil;
+import com.kku.testapi.dto.NotificationRequestDto;
 import com.kku.testapi.entity.User;
 import com.kku.testapi.service.UserService;
 
@@ -22,7 +23,7 @@ public class UserController {
     private SimpMessagingTemplate messagingTemplate;
 
     @GetMapping("/sendNotification")
-    public String sendNotification(@RequestBody NotificationRequest request) {
+    public String sendNotification(@RequestBody NotificationRequestDto request) {
         messagingTemplate.convertAndSend("/notification/messages/" + request.getUserId(), request.getMessage());
         return request.getUserId() + " : " + request.getMessage();
     }
@@ -90,30 +91,21 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/users/search")
+    @GetMapping("/search")
     public List<User> searchUsers(@RequestParam String username) {
         return userService.searchByUsername(username);
     }
-}
 
-class NotificationRequest {
-    private String userId;
-    private String message;
-
-    // Getters และ Setters
-    public String getUserId() {
-        return userId;
+    @GetMapping("/all")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers(); // เรียกใช้งาน Service
+        return ResponseEntity.ok(users);
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

@@ -34,8 +34,6 @@ public class ChatMessageController {
         message.setSender(chatService.getUserById(messageDto.getSenderId()));
         message.setTimestamp(new java.sql.Timestamp(System.currentTimeMillis()));
 
-        System.out.println("Messagertrtrtrttrt: " + message.getContent() + " to room: " + chatRoom.getId());
-
         // บันทึกข้อความลงในฐานข้อมูล
         chatService.saveMessage(message);
 

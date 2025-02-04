@@ -2,9 +2,9 @@ package com.kku.testapi.service;
 
 import java.util.List;
 
-import com.kku.testapi.dto.FriendDto;
+import com.kku.testapi.entity.User;
 
 public interface FriendService {
-    List<FriendDto> findFriendsByUserId(Integer id);
-    
+    List<User> findFriendsByUserId(Integer userId);
+    void addFriend(User userOne, User userTwo);
 }

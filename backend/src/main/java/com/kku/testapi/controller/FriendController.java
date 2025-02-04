@@ -1,30 +1,31 @@
 package com.kku.testapi.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.kku.testapi.dto.FriendDto;
+import com.kku.testapi.entity.User;
 import com.kku.testapi.service.FriendServiceAction;
 
 @RestController
 @RequestMapping("/api/friends")
 public class FriendController {
-    private final FriendServiceAction friendService;
 
     @Autowired
-    public FriendController(FriendServiceAction friendService) {
-        this.friendService = friendService;
+    private FriendServiceAction friendService;
+
+    // ดึงรายการเพื่อนทั้งหมด
+    @GetMapping("/getAllFriends")
+    public ResponseEntity<List<User>> getAllFriends(@RequestParam Integer userId) {
+        List<User> users = friendService.findFriendsByUserId(userId);
+        return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/getAllFriends")
-    public ResponseEntity<List<FriendDto>> getAllFriends(@RequestParam Integer id) {
-        List<FriendDto> friends = friendService.findFriendsByUserId(id);
-        return ResponseEntity.ok(friends);
+    // ลบเพื่อน
+    @DeleteMapping("/remove")
+    public ResponseEntity<String> removeFriend(@RequestParam Integer userId, @RequestParam Integer friendId) {
+        friendService.removeFriend(userId, friendId);
+        return ResponseEntity.ok("Friend removed successfully.");
     }
 }

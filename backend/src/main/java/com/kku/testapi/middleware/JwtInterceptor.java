@@ -12,15 +12,15 @@ import com.kku.testapi.Util.JwtUtil;
 public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+    public boolean preHandle(@SuppressWarnings("null") HttpServletRequest request, @SuppressWarnings("null") HttpServletResponse response, @SuppressWarnings("null") Object handler)
             throws Exception {
         String requestURI = request.getRequestURI();
 
         // อนุญาตเฉพาะ URL ที่ระบุ โดยไม่ต้องตรวจสอบ JWT
-        if (requestURI.equals("/api/login") ||
-                requestURI.equals("/api/register") ||
-                requestURI.equals("/api/logout") ||
-                requestURI.equals("/api")) {
+        if (requestURI.equals("/api/users/login") ||
+                requestURI.equals("/api/users/register") ||
+                requestURI.equals("/api/users/logout") ||
+                requestURI.equals("/api/users")) {
             return true;
         }
 

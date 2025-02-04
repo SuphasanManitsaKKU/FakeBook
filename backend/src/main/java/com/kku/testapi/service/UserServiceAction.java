@@ -64,4 +64,8 @@ public class UserServiceAction implements UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
     }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 }

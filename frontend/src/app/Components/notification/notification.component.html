@@ -10,8 +10,8 @@
         *ngIf="isDropdownVisible">
         <div *ngFor="let message of messages"
             class="px-4 py-2 border-b border-gray-200 last:border-none cursor-pointer hover:bg-gray-100"
-            (click)="navigateToMessageDetail(message.id)">
-            {{ message.text }}
+            (click)="navigateToMessageDetail(message.userId)">
+            {{ message.message }}
         </div>
         <div *ngIf="messages.length === 0" class="px-4 py-2 text-center text-gray-400">
             No notifications

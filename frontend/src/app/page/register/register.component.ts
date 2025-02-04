@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth/auth.service';
+import { UserService } from '../../services/auth/user/user.service';
 
 @Component({
   selector: 'app-register',
@@ -19,7 +19,7 @@ export class RegisterComponent {
   emailError: string = '';
 
   constructor(
-    private authService: AuthService, // Inject AuthService
+    private userService: UserService, // Inject AuthService
     private router: Router
   ) { }
 
@@ -50,7 +50,7 @@ export class RegisterComponent {
     }
 
     // Call AuthService to register
-    this.authService.register(this.username, this.email, this.password).subscribe(
+    this.userService.register(this.username, this.email, this.password).subscribe(
       (response) => {
         console.log('Registration successful:', response);
         this.router.navigate(['/login']); // Redirect to login page after successful registration

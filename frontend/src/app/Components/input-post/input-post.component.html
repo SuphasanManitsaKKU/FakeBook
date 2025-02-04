@@ -1,0 +1,55 @@
+<!-- input-post.component.html -->
+<div
+  class="bg-white rounded-lg shadow-md p-4 flex items-center gap-3 cursor-pointer hover:bg-gray-100 transition"
+  (click)="openModal()"
+>
+  <!-- 🔹 Input สวยๆ -->
+  <input
+    type="text"
+    placeholder="คุณคิดอะไรอยู่?"
+    class="w-full bg-gray-100 text-gray-600 p-2 rounded-full outline-none cursor-pointer"
+    readonly
+  />
+</div>
+
+<!-- 🔹 Modal สร้างโพสต์ (แก้ไข z-index) -->
+<div
+  *ngIf="isModalOpen"
+  class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40"
+>
+  <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+    <h2 class="text-2xl font-semibold mb-4">สร้างโพสต์</h2>
+
+    <form #postForm="ngForm" (ngSubmit)="post()" class="flex flex-col">
+      <!-- ⭐ ใส่ #postContentInput เพื่อใช้กับ ViewChild -->
+      <input
+        #postContentInput
+        type="text"
+        name="content"
+        [(ngModel)]="postContent"
+        #postInput="ngModel"
+        placeholder="พิมพ์ข้อความของคุณที่นี่..."
+        required
+        class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+        (keyup.enter)="postForm.ngSubmit.emit()"
+      />
+
+      <div class="flex justify-between mt-4">
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition"
+        >
+          ยกเลิก
+        </button>
+        <button
+          type="submit"
+          class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+          [disabled]="!postInput.valid"
+        >
+          โพสต์
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

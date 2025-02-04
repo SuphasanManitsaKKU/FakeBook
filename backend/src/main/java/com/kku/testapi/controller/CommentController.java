@@ -1,5 +1,6 @@
 package com.kku.testapi.controller;
 
+import com.kku.testapi.dto.CommentRequestDTO;
 import com.kku.testapi.entity.Comment;
 import com.kku.testapi.service.CommentService;
 
@@ -15,31 +16,37 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
-    // Get all comments for a specific post
+    // ดึงความคิดเห็นทั้งหมดของโพสต์
     @GetMapping("/post/{postId}")
     public List<Comment> getCommentsByPost(@PathVariable Integer postId) {
         return commentService.getCommentsByPost(postId);
     }
 
-    // Create a new comment
+    // ✅ สร้างความคิดเห็นใหม่
     @PostMapping
-    public Comment createComment(@RequestBody Comment comment) {
-        return commentService.createComment(comment);
+    public Comment createComment(@RequestBody CommentRequestDTO commentRequest) {
+        return commentService.createComment(commentRequest);
     }
 
-    // Update an existing comment
+    // ✅ ดึงความคิดเห็นซ้อน (nested comments)
+    @GetMapping("/nested/{parentCommentId}")
+    public List<Comment> getNestedComments(@PathVariable Integer parentCommentId) {
+        return commentService.getNestedComments(parentCommentId);
+    }
+
+    // ✅ อัปเดตความคิดเห็น
     @PutMapping("/{id}")
     public Comment updateComment(@PathVariable Integer id, @RequestBody Comment updatedComment) {
         return commentService.updateComment(id, updatedComment);
     }
 
-    // Delete a comment by ID
+    // ✅ ลบความคิดเห็น
     @DeleteMapping("/{id}")
     public void deleteComment(@PathVariable Integer id) {
         commentService.deleteComment(id);
     }
 
-    // ลบความคิดเห็นทั้งหมดของโพสต์
+    // ✅ ลบความคิดเห็นทั้งหมดของโพสต์
     @DeleteMapping("/post/{postId}")
     public void deleteCommentsByPost(@PathVariable Integer postId) {
         commentService.deleteCommentsByPost(postId);

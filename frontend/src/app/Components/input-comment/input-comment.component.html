@@ -1,0 +1,21 @@
+<form #commentForm="ngForm" (ngSubmit)="addComment()">
+  <div class="input-comment flex items-center gap-2">
+    <input
+      type="text"
+      name="comment"
+      [(ngModel)]="commentMessage"
+      class="w-full p-2 border rounded-md"
+      placeholder="Type your comment..."
+      [disabled]="isSubmitting"
+      required
+    />
+
+    <button
+      type="submit"
+      class="bg-blue-500 text-white py-2 px-4 rounded-md"
+      [disabled]="isSubmitting || !commentMessage.trim()"
+    >
+      {{ isSubmitting ? 'Sending...' : 'Send' }}
+    </button>
+  </div>
+</form>

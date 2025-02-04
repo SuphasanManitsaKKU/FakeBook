@@ -1,1 +1,9 @@
-<router-outlet />
+<div class="flex flex-col min-h-screen">
+    <!-- ใส่ *ngIf เพื่อตรวจสอบว่าปัจจุบันอยู่ในหน้า login/register หรือเปล่า -->
+    <nav *ngIf="!isLoginOrRegisterPage" class="navbar">
+
+        <!-- Navbar -->
+        <app-navbar></app-navbar>
+    </nav>
+    <router-outlet />
+</div>

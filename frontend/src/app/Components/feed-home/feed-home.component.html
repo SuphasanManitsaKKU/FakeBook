@@ -1,0 +1,7 @@
+<app-input-post (postCreated)="onPostCreated()"></app-input-post>
+
+<div class="space-y-4 mt-4">
+  <div *ngFor="let post of posts">
+    <app-post [postId]="post.id" (postDeleted)="onPostDeleted($event)"></app-post>
+  </div>  
+</div>

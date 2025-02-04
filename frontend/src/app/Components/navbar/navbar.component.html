@@ -1,0 +1,33 @@
+<nav class="bg-white shadow p-4 flex justify-between items-center">
+  <!-- ด้านซ้าย: FakeBook + Search -->
+  <div class="flex items-center space-x-4">
+    <!-- เพิ่มข้อความ FakeBook -->
+    <span class="text-xl font-bold text-indigo-600 cursor-pointer" (click)="goToHome()">
+      FakeBook
+    </span>
+    
+    <app-search></app-search>
+  </div>
+
+  <!-- ด้านขวา: Notification & Profile -->
+  <div class="flex items-center space-x-4">
+    <app-notification></app-notification>
+
+    <!-- Profile Menu -->
+    <div class="relative">
+      <img [src]="userData?.imageProfile || 'default-profile.png'" alt="Profile"
+        class="rounded-full w-10 h-10 object-cover cursor-pointer" (click)="toggleProfileMenu()" />
+
+      <!-- เมื่อคลิกแล้วให้แสดงเมนูย่อย -->
+      <div *ngIf="isProfileMenuOpen"
+        class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg">
+        <button class="block w-full text-left px-4 py-2 hover:bg-gray-100" (click)="goToProfile()">
+          Profile
+        </button>
+
+        <!-- Logout -->
+        <app-logout></app-logout>
+      </div>
+    </div>
+  </div>
+</nav>

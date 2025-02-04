@@ -1,0 +1,28 @@
+<!-- ครอบด้วย container กลางจอ -->
+<div class="max-w-2xl mx-auto mt-8 px-4">
+
+    <!-- เช็คว่ามี post แล้วหรือไม่ -->
+    <div *ngIf="post; else loadingTemplate">
+
+        <!-- ถ้ามี post จึงแสดง <app-post> -->
+        <!-- สามารถใส่ card / shadow / border ฯลฯ ถ้าต้องการเพิ่ม -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <app-post [postId]="postId"></app-post>
+        </div>
+
+    </div>
+
+    <!-- ถ้ายังโหลดโพสต์ไม่เสร็จ ให้แสดง Template ด้านล่าง -->
+    <ng-template #loadingTemplate>
+        <div class="flex flex-col items-center justify-center h-56 text-gray-500">
+            <!-- ตัวอย่าง icon หมุน (spinner) ใช้ Tailwind animate-spin -->
+            <svg class="animate-spin h-8 w-8 text-gray-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+            </svg>
+            <p>กำลังโหลดโพสต์...</p>
+        </div>
+    </ng-template>
+
+</div>

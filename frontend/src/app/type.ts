@@ -1,14 +1,3 @@
-export interface ChatRoom {
-    id: number;
-    userOne: User;
-    userTwo: User;
-}
-
-export interface Friend {
-    id: number;
-    user: User;
-}
-
 export interface User {
     id: number;
     email: string;
@@ -17,36 +6,118 @@ export interface User {
     username: string;
 }
 
-export interface Sender {
+export interface Comment {
     id: number;
-    email: string;
-    imageProfile: string | null;
-    password: string;
-    username: string;
+    message: string;
+    post: Post;
+    user: User;
+    parentComment: Comment | null; // Null หมายถึงเป็นคอมเมนต์หลัก
+    level?: number; // ✅ เพิ่ม level เข้าไปให้รองรับความลึก
+}
+
+export interface ChatRoom {
+    id: number;
+    userOne: User;
+    userTwo: User;
+    messages: Message[];
 }
 
 export interface Message {
     id: number;
     chatRoom: ChatRoom;
-    sender: Sender;
+    sender: User;
     content: string;
-    timestamp: string; // ใช้เป็น string เนื่องจาก timestamp มาในรูปแบบ ISO-8601
+    timestamp: string;
 }
 
-export interface Post {
+// ---------------------------------------------------
+
+// export interface FriendDto {
+//     id: number;
+//     username: string;
+//     email: string;
+// }
+
+export interface FriendRequest {
+    id: number;
+    sender: User;
+    receiver: User;
+    status: 'pending' | 'accepted' | 'declined';
+}
+
+// post-dto.interface.ts
+export interface PostDTO {
+    content: string;
+    userId: number;
+}
+
+// post-response-dto.interface.ts
+export interface PostResponseDTO {
     id: number;
     content: string;
+    user: User;  // ✅ ใช้ `User` แทน `userId`
+    timestamp: string;
     likeAmount: number;
     commentAmount: number;
     shareAmount: number;
-    userId: number;
-    comments: Comment[];
 }
 
-export interface Comment {
+// post.interface.ts
+// export interface Post {
+//     id: number;
+//     content: string;
+//     userId: number;
+//     timestamp: string;
+//     likeAmount: number;
+//     commentAmount: number;
+//     shareAmount: number;
+// }
+
+// post-response-dto.interface.ts
+export interface PostResponseDTO {
     id: number;
-    message: string;
-    postId: number;
+    content: string;
     userId: number;
-    parentCommentId?: number;
+    timestamp: string;  // Can be a string if you handle ISO 8601 formatted timestamps
+    likeAmount: number;
+    commentAmount: number;
+    shareAmount: number;
+}
+
+// comment-request-dto.interface.ts
+export interface CommentRequestDTO {
+    postId: number;
+    message: string;
+    userId: number;
+    parentCommentId: number | null;
+}
+
+// post-response-dto.interface.ts
+export interface Post {
+    id: number;
+    content: string;
+    user: User;  // ✅ ใช้ `User` แทน `userId`
+    timestamp: string;
+}
+
+export interface PostResponseDTO {
+    id: number;
+    content: string;
+    userId: number;  // ✅ ใช้ `userId` แทน `User`
+    timestamp: string;
+    likeAmount: number;
+    commentAmount: number;
+    shareAmount: number;
+}
+
+// share-response.interface.ts
+export interface ShareResponse {
+    post: PostResponseDTO;
+    shareId: number;
+}
+
+export interface NotificationRequestDto {
+    userId: string; // ใช้ string แทน String
+    message: string; // ใช้ string แทน String
+    type: string;    // ใช้ string แทน String
 }

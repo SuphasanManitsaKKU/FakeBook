@@ -3,16 +3,16 @@
     <div class="w-full md:w-1/4 bg-gray-100 p-4 rounded-lg shadow">
         <h3 class="text-lg font-semibold text-gray-700 mb-4">Friends</h3>
         <ul class="space-y-2">
-            <li *ngFor="let friend of friends" (click)="selectFriend(friend.user.id)"
+            <li *ngFor="let friend of friends" (click)="selectFriend(friend.id)"
                 class="flex items-center gap-4 p-2 rounded-lg bg-gray-200 hover:bg-blue-200 cursor-pointer transition text-gray-700">
                 <!-- รูปโปรไฟล์ -->
                 <img
-                    [src]="friend.user.imageProfile || 'favicon.ico'"
-                    alt="{{ friend.user.username }}"
+                    [src]="friend.imageProfile || 'favicon.ico'"
+                    alt="{{ friend.username }}"
                     class="w-10 h-10 rounded-full object-cover"
                 />
                 <!-- ชื่อผู้ใช้ -->
-                <span>{{ friend.user.username }}</span>
+                <span>{{ friend.username }}</span>
             </li>
         </ul>
         <div *ngIf="friends.length === 0" class="text-center text-gray-500 mt-4">

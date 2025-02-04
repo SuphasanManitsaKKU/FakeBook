@@ -8,18 +8,23 @@ public class ChatRoomRequestDto {
     public Integer getUserOneId() {
         return userOneId;
     }
+
     public void setUserOneId(Integer userOneId) {
         this.userOneId = userOneId;
     }
+
     public Integer getUserTwoId() {
         return userTwoId;
     }
+
     public void setUserTwoId(Integer userTwoId) {
         this.userTwoId = userTwoId;
     }
+
     public Integer getChatRoomId() {
         return chatRoomId;
     }
+
     public void setChatRoomId(Integer chatRoomId) {
         this.chatRoomId = chatRoomId;
     }

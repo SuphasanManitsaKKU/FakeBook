@@ -1,12 +1,14 @@
 import { CanActivateFn } from '@angular/router';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserService } from './services/user/user.service'; // Import AuthService
+import { UserPublicService } from './services/userPublic/userPublic.service'; // Import AuthService
 
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router); // ใช้ Dependency Injection เพื่อเรียก Router
-  const userService = inject(UserService); // Inject AuthService
+  const userPublicService = inject(UserPublicService); // Inject AuthService
 
+  console.log("Hello from authGuard");
+  
   const getToken = (): string | null => {
     try {
       const name = 'token=';
@@ -35,7 +37,9 @@ export const authGuard: CanActivateFn = (route, state) => {
 
       if (payload.exp > currentTime) {
         // เก็บ userId และ username ใน AuthService
-        userService.setUserInfo(payload.userId, payload.sub);
+        userPublicService.setUserInfo(payload.userId, payload.sub);
+        console.log("userPublicService", userPublicService);
+        
         return true;
       }
     } catch (error) {

@@ -26,7 +26,6 @@ public class Notification {
     private Integer contentId;
 
     // Getters and Setters
-
     public Integer getId() {
         return id;
     }
