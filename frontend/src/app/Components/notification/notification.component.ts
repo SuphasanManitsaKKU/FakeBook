@@ -7,14 +7,16 @@ import { NotificationRequestDto } from '../../type';
 
 @Component({
     selector: 'app-notification',
+    standalone: true,
     imports: [CommonModule],
     templateUrl: './notification.component.html',
     styleUrls: ['./notification.component.css']
 })
 export class NotificationComponent implements OnInit {
     messages: NotificationRequestDto[] = [];
-    unreadCount: number = 0; // ตั้งค่าเริ่มต้นเป็น 0
+    unreadCount: number = 0;
     isDropdownVisible: boolean = false;
+    userId: number | null = null;
 
     constructor(
         private userPublicService: UserPublicService,
@@ -23,43 +25,56 @@ export class NotificationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        // Subscribe เพื่อรับข้อความจาก WebSocket
-        this.notificationService.getMessages().subscribe((message: string) => {
-            try {
-                // ตรวจสอบว่า message ไม่ว่างเปล่าหรือไม่
-                if (message && message.trim() !== '') {
-                    // แปลงข้อความที่ได้รับจาก WebSocket เป็น JavaScript object
-                    const parsedMessage = JSON.parse(message);
-    
-                    // สร้าง NotificationRequestDto จากข้อมูลที่ได้รับ
-                    const formattedMessage: NotificationRequestDto = {
-                        userId: parsedMessage.userId, // ดึง userId จาก parsed message
-                        message: parsedMessage.message, // ดึง message จาก parsed message
-                        type: parsedMessage.type // ดึง type จาก parsed message
-                    };
-                    
-                    // เพิ่มข้อความใหม่ลงใน list
-                    this.messages.push(formattedMessage); 
-                    this.unreadCount++; // เพิ่มจำนวนแจ้งเตือนที่ยังไม่ได้อ่าน
-                } else {
-                    console.warn('Received an empty or invalid message');
+        this.userId = this.userPublicService.getUserId();
+        
+        if (!this.userId || this.userId === 0) {
+            console.warn("User ID is not available. Trying to retrieve again...");
+            setTimeout(() => {
+                this.userId = this.userPublicService.getUserId();
+                console.log('User ID after retry:', this.userId);
+
+                if (!this.userId || this.userId === 0) {
+                    console.warn("User ID still not found. Skipping WebSocket connection.");
+                    return;
                 }
+
+                this.notificationService.initializeWebSocketConnection(this.userId);
+            }, 1000); 
+            return;
+        }
+
+        this.notificationService.initializeWebSocketConnection(this.userId);
+
+        this.notificationService.getMessages().subscribe((message: string) => {
+            if (!message || message.trim() === '') {
+                console.warn('Received an empty message.');
+                return;
+            }
+
+            try {
+                const parsedMessage = JSON.parse(message);
+                const formattedMessage: NotificationRequestDto = {
+                    userId: parsedMessage.userId || '',
+                    message: parsedMessage.message || 'No message content',
+                    type: parsedMessage.type || 'info'
+                };
+
+                this.messages.push(formattedMessage);
+                this.unreadCount++;
             } catch (error) {
-                console.error('Error parsing message:', error);
+                console.error('Error parsing WebSocket message:', error);
             }
         });
     }
 
-    // ฟังก์ชันเปิด/ปิด dropdown
     toggleNotifications(): void {
         this.isDropdownVisible = !this.isDropdownVisible;
         if (this.isDropdownVisible) {
-            this.unreadCount = 0; // รีเซ็ตการแจ้งเตือนเมื่อเปิด dropdown
+            this.unreadCount = 0;
         }
     }
 
-    // ฟังก์ชันนำทางไปยังรายละเอียดข้อความ
     navigateToMessageDetail(id: string): void {
-        this.router.navigate(['/message', id]); // เปลี่ยนหน้าไปยังเส้นทาง /message/:id
+        this.router.navigate(['/message', id]);
     }
 }

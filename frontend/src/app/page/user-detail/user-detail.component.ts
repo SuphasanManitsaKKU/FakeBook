@@ -15,14 +15,20 @@ import { FeedUserComponent } from '../../Components/feed-user/feed-user.componen
 })
 export class UserDetailComponent implements OnInit {
   userId: number | null = null;
+  loggedInUserId: number | null = null; // userId ของผู้ใช้ที่ล็อกอิน
   userData: any = null;
   isEditing = false;
+  isOwner = false; // ตรวจสอบว่าเป็นเจ้าของโปรไฟล์หรือไม่
   editData: any = {};
 
   constructor(private route: ActivatedRoute, private userService: UserService, private userPublicService: UserPublicService) { }
 
   ngOnInit(): void {
-    this.userId = this.userPublicService.getUserId();
+    this.loggedInUserId = this.userPublicService.getUserId(); // ดึง userId ของผู้ใช้ที่ล็อกอิน
+    this.userId = this.route.snapshot.params['id'] ? Number(this.route.snapshot.params['id']) : this.loggedInUserId; // ใช้ userId จาก URL หรือจากที่ล็อกอิน
+
+    this.isOwner = this.userId == this.loggedInUserId; // เช็คว่า userId ที่ดูอยู่เป็น userId ของเราเองหรือไม่
+
     this.loadUserProfile();
   }
 
@@ -39,31 +45,29 @@ export class UserDetailComponent implements OnInit {
 
   /** ✅ เปิด/ปิดโหมดแก้ไข */
   toggleEditMode(): void {
+    if (!this.isOwner) return; // ถ้าไม่ใช่เจ้าของห้ามแก้ไข
     this.isEditing = !this.isEditing;
   }
 
   /** ✅ บันทึกการแก้ไขโปรไฟล์ */
   saveProfile(): void {
-    console.log('🔹 Sending update request:', this.editData); // Debug JSON ที่ส่งไป
+    if (!this.isOwner) return; // ป้องกันการแก้ไขถ้าไม่ใช่เจ้าของ
 
+    console.log('🔹 Sending update request:', this.editData);
     this.userService.updateUserProfile(this.userId!, this.editData).subscribe({
       next: () => {
         this.isEditing = false;
-        this.loadUserProfile(); // โหลดข้อมูลใหม่
+        this.loadUserProfile();
       },
       error: (err) => console.error('บันทึกข้อมูลล้มเหลว:', err)
     });
   }
 
-
-  /** ✅ เปลี่ยน Cover Image (แสดงภาพใหม่ + เก็บ path) */
+  /** ✅ เปลี่ยน Cover Image */
   onCoverImageChange(event: any): void {
+    if (!this.isOwner) return; // ป้องกันการแก้ไข
     const file = event.target.files[0];
     if (file) {
-      const path = `assets/uploads/${file.name}`;
-      this.editData.coverImage = path;
-
-      // ✅ แสดงรูปใหม่ทันที
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.userData.coverImage = e.target.result; // อัปเดต UI ทันที
@@ -72,14 +76,11 @@ export class UserDetailComponent implements OnInit {
     }
   }
 
-  /** ✅ เปลี่ยน Profile Image (แสดงภาพใหม่ + เก็บ path) */
+  /** ✅ เปลี่ยน Profile Image */
   onProfileImageChange(event: any): void {
+    if (!this.isOwner) return; // ป้องกันการแก้ไข
     const file = event.target.files[0];
     if (file) {
-      const path = `assets/uploads/${file.name}`;
-      this.editData.imageProfile = path;
-
-      // ✅ แสดงรูปใหม่ทันที
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.userData.imageProfile = e.target.result; // อัปเดต UI ทันที
@@ -87,5 +88,4 @@ export class UserDetailComponent implements OnInit {
       reader.readAsDataURL(file);
     }
   }
-
 }

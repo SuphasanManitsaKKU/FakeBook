@@ -14,6 +14,7 @@ import { filter } from 'rxjs';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  title = 'my-app';
   isLoginOrRegisterPage = false;
 
   constructor(private router: Router) {

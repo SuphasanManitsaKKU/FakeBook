@@ -74,5 +74,9 @@ export class NavbarComponent implements OnInit {
   goToHome() {
     this.router.navigate(['/']);  // ✅ นำทางไปหน้า Home
   }
+
+  goToChat() {
+    this.router.navigate(['/chat']);  // ✅ ไปที่หน้าแชท
+  }  
   
 }

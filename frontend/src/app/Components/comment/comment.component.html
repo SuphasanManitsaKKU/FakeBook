@@ -11,21 +11,14 @@
       />
 
       <div class="w-full">
-        <!-- ชื่อผู้ใช้ -->
         <p class="text-sm font-semibold">{{ comment.user.username }}</p>
 
-        <!-- คอมเมนต์ (ถ้าไม่อยู่ในโหมดแก้ไข) -->
         <p *ngIf="editingCommentId !== comment.id" class="text-gray-700 text-base">
           {{ comment.message }}
         </p>
 
-        <!-- ฟอร์มแก้ไขคอมเมนต์ -->
-        <div *ngIf="editingCommentId === comment.id">
-          <input
-            type="text"
-            [(ngModel)]="editedMessage"
-            class="w-full p-2 border rounded-md"
-          />
+        <div *ngIf="editingCommentId == comment.id">
+          <input type="text" [(ngModel)]="editedMessage" class="w-full p-2 border rounded-md" />
           <button class="bg-green-500 text-white py-1 px-2 rounded-md mt-2" (click)="saveEdit(comment)">
             บันทึก
           </button>
@@ -34,53 +27,37 @@
 
         <!-- ปุ่มต่าง ๆ ใต้คอมเมนต์ -->
         <div class="flex gap-2 mt-2">
-          <!-- ตอบกลับ -->
           <button class="text-blue-500 hover:underline" (click)="startReply(comment.id)">ตอบกลับ</button>
-          <!-- แก้ไข -->
-          <button class="text-yellow-500 hover:underline" (click)="startEdit(comment)">แก้ไข</button>
-          <!-- ลบ -->
-          <button class="text-red-500 hover:underline" (click)="deleteComment(comment.id)">ลบ</button>
+
+          <!-- ✅ ปุ่มแก้ไข (เฉพาะเจ้าของ) -->
+          <button *ngIf="comment.user.id == userId" class="text-yellow-500 hover:underline" (click)="startEdit(comment)">แก้ไข</button>
+
+          <!-- ✅ ปุ่มลบ (เฉพาะเจ้าของ) -->
+          <button *ngIf="comment.user.id == userId" class="text-red-500 hover:underline" (click)="deleteComment(comment.id)">ลบ</button>
         </div>
 
-        <!-- กล่อง input-comment สำหรับตอบกลับ (ถ้ากด reply) -->
-        <div *ngIf="replyingToCommentId === comment.id" class="mt-2">
-          <app-input-comment
-            [postId]="postId"
-            [parentCommentId]="comment.id"
-            (commentAdded)="onCommentAddedFromChild()"
-          ></app-input-comment>
+        <!-- กล่อง input-comment สำหรับตอบกลับ -->
+        <div *ngIf="replyingToCommentId == comment.id" class="mt-2">
+          <app-input-comment [postId]="postId" [parentCommentId]="comment.id" (commentAdded)="onCommentAddedFromChild()"></app-input-comment>
           <button class="text-gray-500 mt-2" (click)="stopReply()">ยกเลิก</button>
         </div>
 
-        <!-- แสดงคอมเมนต์ลูก (Replies) -->
+        <!-- คอมเมนต์ลูก (Replies) -->
         <div class="nested-comments mt-4 ml-4 border-l border-gray-300 pl-3 w-[97.5%]">
           <ng-container *ngFor="let reply of repliesMap[comment.id]">
             <div class="reply mb-2 p-3 bg-gray-200 rounded-lg flex items-start w-full">
-              <!-- รูปโปรไฟล์ของผู้ reply -->
-              <img
-                [src]="reply.user.imageProfile ? reply.user.imageProfile : 'default-profile.png'"
-                alt="Profile Image"
-                class="w-8 h-8 rounded-full mr-3"
-              />
+              <img [src]="reply.user.imageProfile ? reply.user.imageProfile : 'default-profile.png'" alt="Profile Image" class="w-8 h-8 rounded-full mr-3" />
               <div class="w-full">
                 <p class="text-sm font-semibold">{{ reply.user.username }}</p>
-                <p class="text-gray-700 text-sm">
-                  {{ reply.message }}
-                </p>
+                <p class="text-gray-700 text-sm">{{ reply.message }}</p>
                 <div class="flex gap-2 mt-1">
                   <button class="text-blue-500 hover:underline" (click)="startReply(reply.id)">ตอบกลับ</button>
-                  <button class="text-yellow-500 hover:underline" (click)="startEdit(reply)">แก้ไข</button>
-                  <button class="text-red-500 hover:underline" (click)="deleteComment(reply.id)">ลบ</button>
-                </div>
 
-                <!-- ช่องใส่คอมเมนต์ถ้ากดตอบกลับซ้ำ -->
-                <div *ngIf="replyingToCommentId === reply.id" class="mt-2">
-                  <app-input-comment
-                    [postId]="postId"
-                    [parentCommentId]="reply.id"
-                    (commentAdded)="onCommentAddedFromChild()"
-                  ></app-input-comment>
-                  <button class="text-gray-500 mt-1" (click)="stopReply()">ยกเลิก</button>
+                  <!-- ✅ ปุ่มแก้ไข (เฉพาะเจ้าของ) -->
+                  <button *ngIf="reply.user.id == userId" class="text-yellow-500 hover:underline" (click)="startEdit(reply)">แก้ไข</button>
+
+                  <!-- ✅ ปุ่มลบ (เฉพาะเจ้าของ) -->
+                  <button *ngIf="reply.user.id == userId" class="text-red-500 hover:underline" (click)="deleteComment(reply.id)">ลบ</button>
                 </div>
               </div>
             </div>
@@ -89,6 +66,7 @@
       </div>
     </div>
   </ng-container>
+
 
   <!-- 🔹 InputComment สำหรับคอมเมนต์ใหม่ (ไม่ตอบใคร) -->
   <div class="mt-6">

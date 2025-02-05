@@ -9,8 +9,17 @@
     <app-search></app-search>
   </div>
 
-  <!-- ด้านขวา: Notification & Profile -->
+  <!-- ด้านขวา: Chat, Notification & Profile -->
   <div class="flex items-center space-x-4">
+    <!-- ✅ Chat Icon -->
+    <button (click)="goToChat()" class="relative">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+        class="w-6 h-6 text-gray-600 hover:text-gray-900 transition">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 20h9m-9 0a9 9 0 01-9-9 9 9 0 019-9m0 18c-3.87 0-7-3.13-7-7 0-3.87 3.13-7 7-7m0 0V2m0 2V2m0 18V2" />
+      </svg>
+    </button>
+
     <app-notification></app-notification>
 
     <!-- Profile Menu -->

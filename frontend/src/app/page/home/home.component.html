@@ -51,11 +51,11 @@
                 </div>
             </div>
 
-            <!-- Friend List -->
+            <!-- ✅ Friend List (ใช้ friendsList แทน users) -->
             <div class="bg-white shadow rounded-lg p-4">
                 <h2 class="text-lg font-bold text-gray-700 mb-2">My Friends</h2>
                 <div class="space-y-2">
-                    <div *ngFor="let friend of friends"
+                    <div *ngFor="let friend of friendsList"
                         class="flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded-md transition"
                         (click)="goToUserDetail(friend.id)">
                         <img [src]="friend.imageProfile || 'default-profile.png'" alt="Profile"
@@ -66,6 +66,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
         <!-- Center Column (col-span-6): Feed Home -->
@@ -75,20 +76,40 @@
 
         <!-- Right Column (col-span-3): All Users -->
         <div class="col-span-12 lg:col-span-3 space-y-4">
-            <div class="bg-white shadow rounded-lg p-4">
-                <h2 class="text-lg font-bold text-gray-700 mb-2">All Users</h2>
-                <div class="space-y-2">
-                    <div *ngFor="let user of allUsers"
-                        class="flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded-md transition"
-                        (click)="goToUserDetail(user.id)">
-                        <img [src]="user.imageProfile || 'default-profile.png'" alt="Profile"
-                            class="w-8 h-8 object-cover rounded-full mr-2" />
-                        <span class="text-gray-700">
-                            {{ user.username }}
-                        </span>
+            <div class="container mx-auto p-6 max-w-4xl">
+                <h2 class="text-2xl font-bold text-indigo-600 text-center">รายชื่อผู้ใช้ทั้งหมด</h2>
+
+                <div class="mt-6 space-y-4">
+                    <div *ngFor="let user of users"
+                        class="flex items-center justify-between bg-gray-100 shadow hover:bg-gray-100 p-2 rounded-md transition"
+                        (click)="goToUserDetail(user.id)"
+                        >
+
+                        <!-- ✅ ข้อมูลผู้ใช้ -->
+                        <div class="flex items-center gap-3">
+                            <img [src]="user.imageProfile || 'default-profile.png'" alt="Profile Image"
+                                class="w-10 h-10 rounded-full border">
+                            <div>
+                                <p class="font-semibold text-gray-800">{{ user.username }}</p>
+                            </div>
+                        </div>
+
+                        <!-- ✅ ปุ่มเพิ่มเพื่อน -->
+                        <div>
+                            <!-- 🟢 ปุ่มเพิ่มเพื่อน ถ้ายังไม่เป็นเพื่อนและยังไม่ได้ส่งคำขอ -->
+                            <button *ngIf="!isFriend(user.id) && !isPendingRequest(user.id)"
+                                (click)="addFriend(user.id)"
+                                class="px-3 py-1 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 transition">
+                                +
+                            </button>
+
+                            <!-- ⏳ แสดงข้อความ "รอการตอบรับ" ถ้าส่งคำขอไปแล้ว -->
+                            <p *ngIf="isPendingRequest(user.id)" class="text-gray-500 text-sm">รอการตอบรับ...</p>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
 
     </div>

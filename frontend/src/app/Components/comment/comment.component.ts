@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import { InputCommentComponent } from '../input-comment/input-comment.component';
 import { CommentService } from '../../services/auth/comment/comment.service';
 import { Comment } from '../../type';
+import { UserPublicService } from '../../services/userPublic/userPublic.service';
 
 @Component({
   selector: 'app-comment',
@@ -28,10 +29,12 @@ export class CommentComponent implements OnInit {
   replyingToCommentId: number | null = null;
   editingCommentId: number | null = null;
   editedMessage: string = '';
-
-  constructor(private commentService: CommentService) {}
+  userId: number = 0;
+  
+  constructor(private commentService: CommentService, private userPublicService: UserPublicService) { }
 
   ngOnInit(): void {
+    this.userId = this.userPublicService.getUserId(); // ✅ ดึง userId ของผู้ใช้ที่ล็อกอิน
     this.loadComments();
   }
 
