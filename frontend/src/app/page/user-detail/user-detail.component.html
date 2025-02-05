@@ -1,4 +1,92 @@
-<div class="p-6">
-    <h2 class="text-2xl font-bold">รายละเอียดผู้ใช้</h2>
-    <p class="mt-4">ID: {{ userId }}</p>
+<div class="container mx-auto p-6 max-w-4xl">
+  <!-- ✅ Cover Image -->
+  <div class="relative w-full h-64 bg-gray-200 rounded-lg overflow-hidden">
+    <img [src]="userData?.coverImage || 'default-cover.png'" alt="Cover Image" class="w-full h-full object-cover" />
+    <!-- ปุ่มเปลี่ยน Cover -->
+    <label class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-3 py-1 text-xs rounded cursor-pointer">
+      เปลี่ยน Cover
+      <input type="file" (change)="onCoverImageChange($event)" class="hidden">
+    </label>
+  </div>
+
+  <div class="bg-white shadow-lg rounded-lg p-6 mt-6 relative">
+    <!-- ✅ รูปโปรไฟล์ -->
+    <div class="absolute -top-16 left-1/2 transform -translate-x-1/2">
+      <img [src]="userData?.imageProfile || 'default-profile.png'" alt="Profile Image"
+        class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" />
+      <!-- ปุ่มเปลี่ยน Profile -->
+      <label
+        class="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white px-3 py-1 text-xs rounded cursor-pointer">
+        เปลี่ยนรูป
+        <input type="file" (change)="onProfileImageChange($event)" class="hidden">
+      </label>
+    </div>
+
+    <!-- ✅ รายละเอียดผู้ใช้ -->
+    <h2 class="text-2xl font-bold text-indigo-600 text-center mt-10">รายละเอียดผู้ใช้</h2>
+
+    <div class="text-center mt-6">
+      <p class="text-xl font-semibold text-gray-800">{{ userData?.username }}</p>
+      <p class="text-gray-500">{{ userData?.email }}</p>
+    </div>
+
+    <!-- ✅ ข้อมูลเพิ่มเติม -->
+    <div class="mt-6 space-y-3 text-center">
+      <p class="text-gray-600"><span class="font-semibold">Bio:</span> {{ userData?.bio || 'ไม่มีข้อมูล' }}</p>
+      <p class="text-gray-600"><span class="font-semibold">Gender:</span> {{ userData?.gender || 'N/A' }}</p>
+      <p class="text-gray-600"><span class="font-semibold">Location:</span> {{ userData?.location || 'N/A' }}</p>
+      <p class="text-gray-600"><span class="font-semibold">Birthday:</span> {{ userData?.birthday || 'N/A' }}</p>
+    </div>
+
+    <!-- ✅ ปุ่มแก้ไขโปรไฟล์ -->
+    <div class="mt-6 text-center">
+      <button (click)="toggleEditMode()"
+        class="px-4 py-2 bg-yellow-500 text-white rounded-md shadow-md hover:bg-yellow-600 transition">
+        {{ isEditing ? 'ยกเลิก' : 'แก้ไขโปรไฟล์' }}
+      </button>
+    </div>
+
+    <!-- ✅ ฟอร์มแก้ไขโปรไฟล์ -->
+    <div *ngIf="isEditing" class="mt-6">
+      <form (submit)="saveProfile()">
+        <div class="space-y-3">
+          <input type="text" [(ngModel)]="editData.username" name="username" class="w-full p-2 border rounded-md"
+            placeholder="Username" required>
+
+          <textarea [(ngModel)]="editData.bio" name="bio" class="w-full p-2 border rounded-md"
+            placeholder="Bio"></textarea>
+
+          <select [(ngModel)]="editData.gender" name="gender" class="w-full p-2 border rounded-md">
+            <option value="MALE">ชาย</option>
+            <option value="FEMALE">หญิง</option>
+            <option value="OTHER">อื่น ๆ</option>
+          </select>
+
+
+          <input type="text" [(ngModel)]="editData.location" name="location" class="w-full p-2 border rounded-md"
+            placeholder="Location">
+
+          <input type="date" [(ngModel)]="editData.birthday" name="birthday" class="w-full p-2 border rounded-md">
+
+          <button type="submit"
+            class="w-full px-4 py-2 bg-green-500 text-white rounded-md shadow-md hover:bg-green-600 transition">
+            บันทึกข้อมูล
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ✅ ปุ่มกลับ -->
+    <div class="mt-6 text-center">
+      <a routerLink="/" class="px-4 py-2 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 transition">
+        กลับไปหน้าแรก
+      </a>
+    </div>
+  </div>
+
+  <!-- ✅ ฟีดโพสต์ของผู้ใช้ -->
+  <div class="mt-8">
+    <h3 class="text-xl font-bold text-gray-700 mb-4 text-center">โพสต์ของ {{ userData?.username }}</h3>
+    <app-feed-user></app-feed-user>
+  </div>
 </div>

@@ -11,4 +11,6 @@ public interface UserService {
     List<User> searchByUsername(String username); // คืนค่าเป็น List<User>
     User getUserById(Integer id);
     List<User> getAllUsers();
+    User updateUserProfile(User updatedUser);
+    void deleteUser(Integer id);
 }

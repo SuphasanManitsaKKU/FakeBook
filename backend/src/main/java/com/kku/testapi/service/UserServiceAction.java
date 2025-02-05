@@ -68,4 +68,25 @@ public class UserServiceAction implements UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    // ✅ อัปเดตข้อมูลผู้ใช้
+    public User updateUserProfile(User updatedUser) {
+        User user = userRepository.findById(updatedUser.getId()).orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setUsername(updatedUser.getUsername());
+        user.setBio(updatedUser.getBio());
+        user.setGender(updatedUser.getGender());
+        user.setLocation(updatedUser.getLocation());
+        user.setBirthday(updatedUser.getBirthday());
+        user.setCoverImage(updatedUser.getCoverImage());
+        user.setImageProfile(updatedUser.getImageProfile());
+        
+        return userRepository.save(user);
+    }
+
+    // ✅ ลบผู้ใช้
+    public void deleteUser(Integer id) {
+        userRepository.deleteById(id);
+    }
+
 }

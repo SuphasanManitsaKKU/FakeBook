@@ -156,7 +156,7 @@ export class PostComponent implements OnInit {
 
   shareToFeed(): void {
     if (!this.post) return;
-    this.shareService.sharePost(this.post.user.id, this.post.id).subscribe(() => {
+    this.shareService.sharePost(this.userId, this.post.id).subscribe(() => {
       Swal.fire('แชร์สำเร็จ!', 'โพสต์ของคุณถูกแชร์ไปยัง Feed แล้ว', 'success');
       this.showShareOptions = false;
       this.loadPost();

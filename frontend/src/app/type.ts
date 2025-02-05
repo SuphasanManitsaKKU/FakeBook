@@ -1,10 +1,16 @@
 export interface User {
     id: number;
     email: string;
-    imageProfile: string | null;
-    password: string;
     username: string;
+    password: string;
+    imageProfile: string | null;   // รูปโปรไฟล์
+    coverImage: string | null;     // รูป Cover
+    bio: string | null;            // คำแนะนำตัว
+    gender: 'male' | 'female' | 'other' | null;  // เพศ (ENUM)
+    birthday: string | null;       // วันเกิด (YYYY-MM-DD)
+    location: string | null;       // ที่อยู่
 }
+
 
 export interface Comment {
     id: number;

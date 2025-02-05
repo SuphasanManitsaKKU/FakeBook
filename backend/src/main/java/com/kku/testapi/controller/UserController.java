@@ -22,16 +22,14 @@ public class UserController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    @GetMapping("/sendNotification")
-    public String sendNotification(@RequestBody NotificationRequestDto request) {
-        messagingTemplate.convertAndSend("/notification/messages/" + request.getUserId(), request.getMessage());
-        return request.getUserId() + " : " + request.getMessage();
-    }
-
+    @Autowired
     private UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    // ✅ ส่ง Notification ผ่าน WebSocket
+    @PostMapping("/sendNotification")
+    public ResponseEntity<String> sendNotification(@RequestBody NotificationRequestDto request) {
+        messagingTemplate.convertAndSend("/notification/messages/" + request.getUserId(), request.getMessage());
+        return ResponseEntity.ok("Notification sent to user ID: " + request.getUserId());
     }
 
     @GetMapping("")
@@ -44,68 +42,119 @@ public class UserController {
         return "Hello World test";
     }
 
+    // ✅ Login และสร้าง JWT
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody User user) {
         User userLogin = this.userService.login(user.getUsername(), user.getPassword());
+
         // สร้าง JWT Token
         String token = JwtUtil.generateToken(String.valueOf(userLogin.getId()), userLogin.getUsername());
 
         // สร้าง Cookie สำหรับ JWT
         ResponseCookie jwtCookie = ResponseCookie.from("token", token)
-                // .httpOnly(true) // ป้องกันการเข้าถึงจาก JavaScript
                 .secure(false) // เปลี่ยนเป็น true ใน Production (HTTPS)
                 .path("/")
                 .maxAge(24 * 60 * 60) // อายุ 1 วัน
                 .build();
 
-        // ส่ง Response พร้อม Cookie
+        // สร้าง Response JSON
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Login successful");
+        response.put("token", token);
+        response.put("userId", String.valueOf(userLogin.getId()));
+        response.put("username", userLogin.getUsername());
+
         return ResponseEntity.ok()
                 .header("Set-Cookie", jwtCookie.toString())
-                .body(Map.of("message", "Login successful"));
+                .body(response);
     }
 
+    // ✅ Logout และลบ JWT Cookie
     @GetMapping("/logout")
-    public ResponseEntity<?> logout() {
-        // สร้าง Cookie สำหรับลบ JWT
+    public ResponseEntity<Map<String, String>> logout() {
         ResponseCookie jwtCookie = ResponseCookie.from("token", "")
-                .httpOnly(true) // ป้องกันการเข้าถึงจาก JavaScript
-                .secure(false) // เปลี่ยนเป็น true ใน Production (HTTPS)
+                .secure(false)
                 .path("/")
-                .maxAge(0) // ตั้งอายุให้เป็น 0 เพื่อให้ Cookie หมดอายุ
+                .maxAge(0)
                 .build();
 
-        // ส่ง Response พร้อม Cookie ที่ถูกลบ
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Logout successful");
+
         return ResponseEntity.ok()
                 .header("Set-Cookie", jwtCookie.toString())
-                .body(Map.of("message", "Logout successful"));
+                .body(response);
     }
 
+    // ✅ Register ผู้ใช้ใหม่
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Map<String, String>> register(@RequestBody User user) {
         this.userService.register(user);
 
-        // ส่งคำตอบกลับในรูปแบบ JSON
         Map<String, String> response = new HashMap<>();
         response.put("message", "User registered successfully.");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // ✅ ค้นหา User ตามชื่อ
     @GetMapping("/search")
-    public List<User> searchUsers(@RequestParam String username) {
-        return userService.searchByUsername(username);
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers(); // เรียกใช้งาน Service
+    public ResponseEntity<List<User>> searchUsers(@RequestParam String username) {
+        List<User> users = userService.searchByUsername(username);
         return ResponseEntity.ok(users);
     }
 
+    // ✅ ดึง Users ทั้งหมด
+    @GetMapping("/all")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    // ✅ ดึงข้อมูล User ตาม ID
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Integer id) {
         User user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
+    // ✅ อัปเดตข้อมูลผู้ใช้
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUserProfile(@RequestBody User user) {
+        // ตรวจสอบว่ามี User อยู่จริงไหม
+        User existingUser = userService.getUserById(user.getId());
+        if (existingUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // ❌ ถ้าไม่เจอ user, return 404
+        }
+
+        // อัปเดตเฉพาะฟิลด์ที่มีค่า (ป้องกัน null ทับของเดิม)
+        if (user.getUsername() != null)
+            existingUser.setUsername(user.getUsername());
+        if (user.getBio() != null)
+            existingUser.setBio(user.getBio());
+        if (user.getGender() != null)
+            existingUser.setGender(user.getGender());
+        if (user.getLocation() != null)
+            existingUser.setLocation(user.getLocation());
+        if (user.getBirthday() != null)
+            existingUser.setBirthday(user.getBirthday());
+        if (user.getCoverImage() != null)
+            existingUser.setCoverImage(user.getCoverImage());
+        if (user.getImageProfile() != null)
+            existingUser.setImageProfile(user.getImageProfile());
+
+        // บันทึกข้อมูลที่อัปเดตแล้ว
+        User updatedUser = userService.updateUserProfile(existingUser);
+
+        return ResponseEntity.ok(updatedUser); // ✅ คืนค่าเป็น User
+    }
+
+    // ✅ ลบผู้ใช้
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Integer id) {
+        userService.deleteUser(id);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "User deleted successfully.");
+        return ResponseEntity.ok(response);
+    }
 }
