@@ -34,7 +34,6 @@ public class User {
 
     private String location; // ที่อยู่
 
-    // 🟢 Getter & Setter
     public Integer getId() {
         return id;
     }
@@ -114,4 +113,5 @@ public class User {
     public void setLocation(String location) {
         this.location = location;
     }
+
 }

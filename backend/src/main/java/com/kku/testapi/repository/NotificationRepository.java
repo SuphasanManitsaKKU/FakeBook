@@ -21,4 +21,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     // ค้นหาการแจ้งเตือนโดยผู้ส่งและผู้รับ
     List<Notification> findBySenderIdAndReceiverId(Integer senderId, Integer receiverId);
 
+    List<Notification> findByReceiverIdOrderByIdDesc(Integer receiverId);
+
 }

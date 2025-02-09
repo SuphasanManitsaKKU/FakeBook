@@ -22,26 +22,30 @@ public class FriendServiceAction implements FriendService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserService userService;
+
     // ดึงรายชื่อเพื่อนทั้งหมดของผู้ใช้
     @Override
     // ดึงรายชื่อเพื่อนทั้งหมดของผู้ใช้
     public List<User> findFriendsByUserId(Integer userId) {
         // ดึง Friend ทั้งหมดที่มี userId เป็น userOne หรือ userTwo
         List<Friend> friends = friendRepository.findByUserOneIdOrUserTwoId(userId, userId);
-
-        // แปลงจาก Friend ไปเป็น List<User> โดยเลือก userOne หรือ userTwo ที่ไม่ใช่
-        // userId
+    
+        // แปลงจาก Friend ไปเป็น List<User> โดยเลือก userOne หรือ userTwo ที่ไม่ใช่ userId
         return friends.stream()
                 .map(friend -> {
                     // เลือกผู้ใช้ที่ไม่ใช่ userId
-                    if (friend.getUserOne().getId().equals(userId)) {
-                        return friend.getUserTwo(); // คืนค่า userTwo
-                    } else {
-                        return friend.getUserOne(); // คืนค่า userOne
-                    }
+                    Integer friendId = friend.getUserOne().getId().equals(userId) ? 
+                                       friend.getUserTwo().getId() : 
+                                       friend.getUserOne().getId();
+    
+                    // ✅ แปลงข้อมูลของเพื่อนให้มี Base64 ก่อนส่งออก
+                    return userService.getUserWithBase64Images(friendId);
                 })
                 .collect(Collectors.toList());
     }
+    
 
     @Transactional
     public void addFriend(User userOne, User userTwo) {

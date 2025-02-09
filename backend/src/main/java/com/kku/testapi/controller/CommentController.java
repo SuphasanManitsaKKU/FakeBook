@@ -2,7 +2,7 @@ package com.kku.testapi.controller;
 
 import com.kku.testapi.dto.CommentRequestDTO;
 import com.kku.testapi.entity.Comment;
-import com.kku.testapi.service.CommentService;
+import com.kku.testapi.service.CommentServiceAction;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 public class CommentController {
 
     @Autowired
-    private CommentService commentService;
+    private CommentServiceAction commentService;
 
     // ดึงความคิดเห็นทั้งหมดของโพสต์
     @GetMapping("/post/{postId}")

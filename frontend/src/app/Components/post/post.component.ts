@@ -130,7 +130,7 @@ export class PostComponent implements OnInit {
 
   toggleLike(): void {
     if (!this.post) return;
-    this.likeService.toggleLike(this.post.user.id, this.post.id).subscribe((updatedPost: PostResponseDTO) => {
+    this.likeService.toggleLike(this.userId, this.post.id).subscribe((updatedPost: PostResponseDTO) => {
       this.post = updatedPost;
     });
   }

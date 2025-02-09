@@ -9,14 +9,21 @@ import com.kku.testapi.repository.UserRepository;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ChatServiceAction implements ChatService {
 
-    private final ChatRoomRepository chatRoomRepository;
-    private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
+    @Autowired
+    private  ChatRoomRepository chatRoomRepository;
+    @Autowired
+    private  MessageRepository messageRepository;
+    @Autowired
+    private  UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     public ChatServiceAction(ChatRoomRepository chatRoomRepository, MessageRepository messageRepository,
             UserRepository userRepository) {
@@ -39,7 +46,7 @@ public class ChatServiceAction implements ChatService {
     
 
     public User getUserById(Integer userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return userService.getUserWithBase64Images(userId);
     }
 
     public List<Message> getMessages(Integer chatRoomId) {

@@ -8,12 +8,9 @@ import com.kku.testapi.repository.LikeRepository;
 import com.kku.testapi.repository.PostRepository;
 import com.kku.testapi.repository.ShareRepository;
 import com.kku.testapi.repository.UserRepository;
-
 import jakarta.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,101 +32,89 @@ public class PostService {
     @Autowired
     private LikeRepository likeRepository;
 
+    @Autowired
+    private UserService userService; // ✅ Inject UserService
+
     public Post getPostEntityById(Integer id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
     }
 
-    // Get all posts
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    // ✅ ดึงโพสต์ทั้งหมด
+    public List<PostResponseDTO> getAllPosts() {
+        return postRepository.findAll().stream()
+                .map(this::convertToPostResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    // Get post by ID
+    // ✅ ดึงโพสต์ตาม ID
     public PostResponseDTO getPostById(Integer id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
 
-        int likeAmount = likeRepository.countByPostId(id);
-        int commentAmount = commentRepository.countByPostId(id);
-        int shareAmount = shareRepository.countByPostId(id);
-
-        return new PostResponseDTO(
-                post.getId(),
-                post.getContent(),
-                post.getUser(), // ✅ ใช้ `User` แทน `userId`
-                post.getTimestamp(),
-                likeAmount,
-                commentAmount,
-                shareAmount);
+        return convertToPostResponseDTO(post);
     }
 
-    // Create a new post
+    // ✅ สร้างโพสต์ใหม่
     public Post createPost(Post post) {
         return postRepository.save(post);
     }
 
-    // Update an existing post
+    // ✅ อัปเดตโพสต์
     public Post updatePost(Integer id, Post updatedPost) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
+
+        existingPost.setContent(updatedPost.getContent());
         return postRepository.save(existingPost);
     }
 
-    public PostResponseDTO convertToPostResponseDTO(Post post) {
-        return new PostResponseDTO(
-                post.getId(),
-                post.getContent(),
-                post.getUser(), // ✅ ใช้ `User` ตรงๆ
-                post.getTimestamp(),
-                likeRepository.countByPostId(post.getId()),
-                commentRepository.countByPostId(post.getId()),
-                shareRepository.countByPostId(post.getId()));
-    }
-
-    // Delete a post
+    // ✅ ลบโพสต์
     @Transactional
     public void deletePost(Integer postId) {
-        System.out.println("------------------------------1");
-        // 🔹 ตรวจสอบว่าโพสต์มีอยู่จริงหรือไม่
         Post post = postRepository.findById(postId)
-        .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-        
-        System.out.println("------------------------------2");
-        // 🔹 ลบไลก์ที่เกี่ยวข้องก่อน
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
         likeRepository.deleteByPostId(postId);
-        
-        System.out.println("------------------------------3");
-        // 🔹 ลบคอมเมนต์ทั้งหมดที่เกี่ยวข้อง
         commentRepository.deleteByPostId(postId);
-        
-        System.out.println("------------------------------4");
-        // 🔹 ลบแชร์ที่เกี่ยวข้อง (ถ้ามีระบบแชร์)
         shareRepository.deleteByPostId(postId);
-        
-        System.out.println("------------------------------5");
-        // 🔹 ลบโพสต์
         postRepository.delete(post);
-        System.out.println("------------------------------6");
     }
 
-    @Transactional
+    // ✅ ดึงโพสต์ของตัวเองและเพื่อน
     public List<PostResponseDTO> getUserAndFriendsPosts(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
+        System.out.println("----------------------------------------------------------------------------1");
         List<User> friends = userRepository.findFriendsByUserId(userId);
-        friends.add(user); // รวมโพสต์ของตัวเองด้วย
+        System.out.println("----------------------------------------------------------------------------2");
+        friends.add(user);
+        System.out.println("----------------------------------------------------------------------------3");
 
         List<Post> posts = postRepository.findByUserIn(friends);
+        System.out.println("----------------------------------------------------------------------------4");
+        
+        List<PostResponseDTO> resPosts = posts.stream().map(this::convertToPostResponseDTO).collect(Collectors.toList());
+        System.out.println("----------------------------------------------------------------------------8");
+        return resPosts;
+    }
 
-        return posts.stream().map(post -> new PostResponseDTO(
+    // ✅ แปลง `Post` เป็น `PostResponseDTO` และแปลง User ให้มี Base64 Image
+    public PostResponseDTO convertToPostResponseDTO(Post post) {
+        System.out.println("----------------------------------------------------------------------------5");
+        User userWithBase64 = userService.getUserWithBase64Images(post.getUser().getId());
+        System.out.println("----------------------------------------------------------------------------6");
+        // System.out.println(post.getUser().getImageProfile());
+        PostResponseDTO postResponseDTO = new PostResponseDTO(
                 post.getId(),
                 post.getContent(),
-                post.getUser(),
+                userWithBase64, // ✅ ส่ง User ที่แปลงเป็น Base64 แล้ว
                 post.getTimestamp(),
                 likeRepository.countByPostId(post.getId()),
                 commentRepository.countByPostId(post.getId()),
-                shareRepository.countByPostId(post.getId()))).collect(Collectors.toList());
+                shareRepository.countByPostId(post.getId()));
+        System.out.println("----------------------------------------------------------------------------7");
+        return postResponseDTO;
     }
 }

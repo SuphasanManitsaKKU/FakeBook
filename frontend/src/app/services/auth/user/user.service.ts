@@ -35,11 +35,33 @@ export class UserService {
 
     // ✅ ฟังก์ชันสำหรับอัปเดตโปรไฟล์ผู้ใช้ (คืนค่าเป็น User)
     updateUserProfile(userId: number, updatedData: User): Observable<User> {
+        updatedData.imageProfile = null; // ไม่สามารถอัปเดตรูปโปรไฟล์ได้ที่นี่
+        updatedData.coverImage = null; // ไม่สามารถอัปเดตรูป Cover ได้ที่นี่
         return this.http.put<User>(`${this.apiUrl}/${userId}`, updatedData, { withCredentials: true });
     }
 
     // ✅ ฟังก์ชันสำหรับลบบัญชีผู้ใช้
     deleteUser(userId: number): Observable<any> {
         return this.http.delete(`${this.apiUrl}/${userId}`, { withCredentials: true });
+    }
+
+    // ✅ อัปโหลดรูปโปรไฟล์
+    uploadProfileImage(userId: number, file: File): Observable<string> {
+        const formData = new FormData();
+        formData.append('file', file); // ✅ ใส่ key "file" ให้ตรงกับ `@RequestParam("file")` ใน Spring Boot
+
+        return this.http.post<string>(`http://localhost:8080/api/users/${userId}/upload-profile`, formData, {
+            // reportProgress: true,
+            // observe: 'body',
+            withCredentials: true
+        });
+    }
+
+
+    // ✅ อัปโหลดรูป Cover
+    uploadCoverImage(userId: number, file: File): Observable<string> {
+        const formData = new FormData();
+        formData.append('file', file);
+        return this.http.post<string>(`${this.apiUrl}/${userId}/upload-cover`, formData, { withCredentials: true });
     }
 }

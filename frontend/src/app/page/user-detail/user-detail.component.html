@@ -2,7 +2,8 @@
   <!-- ✅ Cover Image -->
   <div class="relative w-full h-64 bg-gray-200 rounded-lg overflow-hidden">
     <img [src]="userData?.coverImage || 'default-cover.png'" alt="Cover Image" class="w-full h-full object-cover" />
-    <label *ngIf="isOwner" class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-3 py-1 text-xs rounded cursor-pointer">
+    <label *ngIf="isOwner && isEditing"
+      class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-3 py-1 text-xs rounded cursor-pointer">
       เปลี่ยน Cover
       <input type="file" (change)="onCoverImageChange($event)" class="hidden">
     </label>
@@ -13,7 +14,7 @@
     <div class="absolute -top-16 left-1/2 transform -translate-x-1/2">
       <img [src]="userData?.imageProfile || 'default-profile.png'" alt="Profile Image"
         class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" />
-      <label *ngIf="isOwner"
+      <label *ngIf="isOwner && isEditing"
         class="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white px-3 py-1 text-xs rounded cursor-pointer">
         เปลี่ยนรูป
         <input type="file" (change)="onProfileImageChange($event)" class="hidden">
@@ -42,26 +43,30 @@
     </div>
 
     <div *ngIf="isEditing && isOwner" class="mt-6">
-      <form (submit)="saveProfile()">
+      <form (submit)="saveProfile(); $event.preventDefault()">
         <div class="space-y-3">
-          <input type="text" [(ngModel)]="editData.username" name="username" class="w-full p-2 border rounded-md" placeholder="Username" required>
-          <textarea [(ngModel)]="editData.bio" name="bio" class="w-full p-2 border rounded-md" placeholder="Bio"></textarea>
-          <select [(ngModel)]="editData.gender" name="gender" class="w-full p-2 border rounded-md">
-            <option value="MALE">ชาย</option>
-            <option value="FEMALE">หญิง</option>
-            <option value="OTHER">อื่น ๆ</option>
-          </select>
-          <input type="text" [(ngModel)]="editData.location" name="location" class="w-full p-2 border rounded-md" placeholder="Location">
-          <input type="date" [(ngModel)]="editData.birthday" name="birthday" class="w-full p-2 border rounded-md">
-          <button type="submit" class="w-full px-4 py-2 bg-green-500 text-white rounded-md shadow-md hover:bg-green-600 transition">
+          <input type="text" [(ngModel)]="editData.username" name="username" class="w-full p-2 border rounded-md"
+            placeholder="Username" required>
+          <textarea [(ngModel)]="editData.bio" name="bio" class="w-full p-2 border rounded-md"
+            placeholder="Bio"></textarea>
+            <select [(ngModel)]="editData.gender" name="gender" class="w-full p-2 border rounded-md">
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+              <option value="OTHER">Other</option>
+            </select>
+            <input type="text" [(ngModel)]="editData.location" name="location" class="w-full p-2 border rounded-md" placeholder="Location">
+            <input type="date" [(ngModel)]="editData.birthday" name="birthday" class="w-full p-2 border rounded-md">
+          <button type="submit"
+            class="w-full px-4 py-2 bg-green-500 text-white rounded-md shadow-md hover:bg-green-600 transition">
             บันทึกข้อมูล
           </button>
         </div>
       </form>
     </div>
-    
-    <div class="mt-6 text-center">
-      <a routerLink="/" class="px-4 py-2 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 transition">
+
+
+    <div (click)="goToHHome()" class="mt-6 text-center">
+      <a class="px-4 py-2 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 transition">
         กลับไปหน้าแรก
       </a>
     </div>

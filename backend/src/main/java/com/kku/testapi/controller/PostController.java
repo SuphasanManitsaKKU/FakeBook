@@ -85,6 +85,8 @@ public class PostController {
 
     @GetMapping("/user-and-friends/{userId}")
     public List<PostResponseDTO> getUserAndFriendsPosts(@PathVariable Integer userId) {
-        return postService.getUserAndFriendsPosts(userId);
+        List<PostResponseDTO> posts = postService.getUserAndFriendsPosts(userId);
+        System.out.println("----------------------------------------------------------------------------9");
+        return posts;
     }
 }

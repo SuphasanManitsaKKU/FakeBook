@@ -8,8 +8,8 @@ import com.kku.testapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
-
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FriendRequestService {
@@ -23,6 +23,9 @@ public class FriendRequestService {
     @Autowired
     private FriendService friendService;
 
+    @Autowired
+    private UserService userService; // ✅ Inject UserService
+
     // ✅ ส่งคำขอเป็นเพื่อน
     @Transactional
     public FriendRequest sendFriendRequest(Integer senderId, Integer receiverId) {
@@ -31,7 +34,6 @@ public class FriendRequestService {
         User receiver = userRepository.findById(receiverId)
                 .orElseThrow(() -> new IllegalArgumentException("Receiver not found"));
 
-        // ตรวจสอบว่ามีคำขออยู่แล้วหรือไม่
         if (friendRequestRepository.existsBySenderAndReceiverAndStatus(sender, receiver, RequestStatus.PENDING)) {
             throw new IllegalStateException("Friend request already sent.");
         }
@@ -69,7 +71,7 @@ public class FriendRequestService {
         return friendRequestRepository.save(request);
     }
 
-    // ✅ ยกเลิกคำขอเป็นเพื่อน (ใช้โดยผู้ส่ง)
+    // ✅ ยกเลิกคำขอเป็นเพื่อน
     @Transactional
     public void cancelFriendRequest(Integer requestId) {
         FriendRequest request = friendRequestRepository.findById(requestId)
@@ -87,7 +89,10 @@ public class FriendRequestService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        return friendRequestRepository.findBySenderAndStatus(user, RequestStatus.PENDING);
+        return friendRequestRepository.findBySenderAndStatus(user, RequestStatus.PENDING)
+                .stream()
+                .map(this::convertFriendRequestToBase64)
+                .collect(Collectors.toList());
     }
 
     // ✅ ดึงคำขอที่เพื่อนส่งมาให้เรา แต่เรายังไม่ได้ตอบรับ
@@ -95,6 +100,16 @@ public class FriendRequestService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        return friendRequestRepository.findByReceiverAndStatus(user, RequestStatus.PENDING);
+        return friendRequestRepository.findByReceiverAndStatus(user, RequestStatus.PENDING)
+                .stream()
+                .map(this::convertFriendRequestToBase64)
+                .collect(Collectors.toList());
+    }
+
+    // ✅ แปลง `FriendRequest` ให้ Sender และ Receiver มี Base64 Image
+    private FriendRequest convertFriendRequestToBase64(FriendRequest request) {
+        request.setSender(userService.getUserWithBase64Images(request.getSender().getId()));
+        request.setReceiver(userService.getUserWithBase64Images(request.getReceiver().getId()));
+        return request;
     }
 }

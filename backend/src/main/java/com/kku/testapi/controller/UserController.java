@@ -8,6 +8,7 @@ import com.kku.testapi.service.UserService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,15 +16,27 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.kku.testapi.repository.UserRepository;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+    private static final String UPLOAD_DIR = "public/assets/";
+
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     // ✅ ส่ง Notification ผ่าน WebSocket
     @PostMapping("/sendNotification")
@@ -112,19 +125,29 @@ public class UserController {
 
     // ✅ ดึงข้อมูล User ตาม ID
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Integer id) {
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+    public User getUser(@PathVariable Integer id) {
+        return userService.getUserWithBase64Images(id);
     }
 
     // ✅ อัปเดตข้อมูลผู้ใช้
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUserProfile(@RequestBody User user) {
         // ตรวจสอบว่ามี User อยู่จริงไหม
-        User existingUser = userService.getUserById(user.getId());
+        // ✅ ใช้วิธีที่ปลอดภัยกว่าด้วย findById
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + user.getId()));
+
         if (existingUser == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // ❌ ถ้าไม่เจอ user, return 404
         }
+        System.out.println(existingUser.getId());
+        System.out.println(existingUser.getUsername());
+        System.out.println(existingUser.getBio());
+        System.out.println(existingUser.getGender());
+        System.out.println(existingUser.getLocation());
+        System.out.println(existingUser.getBirthday());
+        System.out.println(existingUser.getImageProfile());
+        System.out.println(existingUser.getCoverImage());
 
         // อัปเดตเฉพาะฟิลด์ที่มีค่า (ป้องกัน null ทับของเดิม)
         if (user.getUsername() != null)
@@ -137,15 +160,12 @@ public class UserController {
             existingUser.setLocation(user.getLocation());
         if (user.getBirthday() != null)
             existingUser.setBirthday(user.getBirthday());
-        if (user.getCoverImage() != null)
-            existingUser.setCoverImage(user.getCoverImage());
-        if (user.getImageProfile() != null)
-            existingUser.setImageProfile(user.getImageProfile());
 
         // บันทึกข้อมูลที่อัปเดตแล้ว
         User updatedUser = userService.updateUserProfile(existingUser);
 
         return ResponseEntity.ok(updatedUser); // ✅ คืนค่าเป็น User
+        // return ResponseEntity.ok(existingUser); // ✅ คืนค่าเป็น User
     }
 
     // ✅ ลบผู้ใช้
@@ -157,4 +177,64 @@ public class UserController {
         response.put("message", "User deleted successfully.");
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/{userId}/upload-profile")
+    public ResponseEntity<String> uploadProfileImage(@PathVariable Integer userId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("File is empty.");
+            }
+
+            // ✅ ดึงนามสกุลไฟล์ เช่น ".png", ".jpg"
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+
+            // ✅ สร้างชื่อไฟล์ใหม่แบบสุ่ม เช่น "profile_1_9f3d6a7b.png"
+            String filename = "profile_" + userId + "_" + UUID.randomUUID() + extension;
+            Path path = Paths.get(UPLOAD_DIR + filename);
+
+            // ✅ บันทึกไฟล์ลงโฟลเดอร์ `public/assets/`
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
+            // ✅ เก็บ Path ของไฟล์ลงฐานข้อมูล เช่น "/assets/profile_1_xxx.png"
+            String filePath = "/assets/" + filename;
+            System.out.println(filePath);
+            userService.updateProfileImage(userId, filePath); // ✅ บันทึกลง DB
+
+            return ResponseEntity.ok(filePath); // ✅ ส่ง Path กลับไปให้ Frontend ใช้
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error uploading file: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/{userId}/upload-cover")
+    public ResponseEntity<String> uploadCoverImage(@PathVariable Integer userId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("File is empty.");
+            }
+
+            // ✅ ดึงนามสกุลไฟล์ เช่น ".png", ".jpg"
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+
+            // ✅ สร้างชื่อไฟล์ใหม่แบบสุ่ม เช่น "profile_1_9f3d6a7b.png"
+            String filename = "profile_" + userId + "_" + UUID.randomUUID() + extension;
+            Path path = Paths.get(UPLOAD_DIR + filename);
+
+            // ✅ บันทึกไฟล์ลงโฟลเดอร์ `public/assets/`
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
+            // ✅ เก็บ Path ของไฟล์ลงฐานข้อมูล เช่น "/assets/profile_1_xxx.png"
+            String filePath = "/assets/" + filename;
+            userService.updateCoverImage(userId, filePath); // ✅ ใช้เมธอดใหม่
+
+            return ResponseEntity.ok(filePath);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error uploading file: " + e.getMessage());
+        }
+    }
+
 }

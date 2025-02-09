@@ -6,7 +6,7 @@ export interface User {
     imageProfile: string | null;   // รูปโปรไฟล์
     coverImage: string | null;     // รูป Cover
     bio: string | null;            // คำแนะนำตัว
-    gender: 'male' | 'female' | 'other' | null;  // เพศ (ENUM)
+    gender: 'MALE' | 'FEMALE' | 'OTHER' | null;  // เพศ (ENUM)
     birthday: string | null;       // วันเกิด (YYYY-MM-DD)
     location: string | null;       // ที่อยู่
 }
@@ -126,4 +126,5 @@ export interface NotificationRequestDto {
     userId: string; // ใช้ string แทน String
     message: string; // ใช้ string แทน String
     type: string;    // ใช้ string แทน String
+    contentId: string; // ใช้ number แทน Number
 }

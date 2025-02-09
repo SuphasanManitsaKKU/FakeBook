@@ -15,6 +15,8 @@ public class LikeController {
     // Toggle like (if already liked, remove it; otherwise, add it)
     @PostMapping("/toggle")
     public PostResponseDTO toggleLike(@RequestParam Integer userId, @RequestParam Integer postId) {
-        return likeService.toggleLike(userId, postId);
+        PostResponseDTO response = likeService.toggleLike(userId, postId);
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++676767");
+        return response;
     }
 }

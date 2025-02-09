@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { UserPublicService } from '../../services/userPublic/userPublic.service';
-import { NotificationService } from './../../services/websocket/notification/notification.service';
+import { NotificationServiceSocket } from '../../services/websocket/notification/notificationSocket.service';
 import { NotificationRequestDto } from '../../type';
+import { NotificationService } from '../../services/auth/notification/notification.service';
 
 @Component({
     selector: 'app-notification',
@@ -20,51 +21,72 @@ export class NotificationComponent implements OnInit {
 
     constructor(
         private userPublicService: UserPublicService,
-        private notificationService: NotificationService,
-        private router: Router
+        private notificationServiceSocket: NotificationServiceSocket,
+        private router: Router,
+        private notificationService: NotificationService
     ) { }
 
     ngOnInit(): void {
         this.userId = this.userPublicService.getUserId();
-        
+        console.log("🔎 Checking User ID:", this.userId);
+
         if (!this.userId || this.userId === 0) {
-            console.warn("User ID is not available. Trying to retrieve again...");
+            console.warn("⚠️ User ID is not available. Retrying...");
             setTimeout(() => {
                 this.userId = this.userPublicService.getUserId();
-                console.log('User ID after retry:', this.userId);
+                console.log('🔄 Retried User ID:', this.userId);
 
                 if (!this.userId || this.userId === 0) {
-                    console.warn("User ID still not found. Skipping WebSocket connection.");
+                    console.warn("❌ User ID still not found. Skipping WebSocket connection.");
                     return;
                 }
 
-                this.notificationService.initializeWebSocketConnection(this.userId);
-            }, 1000); 
+                this.notificationService.getNotifications(this.userId).subscribe({
+                    next: (notifications) => {
+                      this.messages = notifications;
+                      this.unreadCount = notifications.length;
+                    },
+                    error: (err) => console.error('โหลดแจ้งเตือนล้มเหลว:', err)
+                  });
+
+                this.notificationServiceSocket.initializeWebSocketConnection(this.userId);
+
+                this.notificationServiceSocket.getMessages().subscribe((message: string | null) => {
+                    console.log("📩 WebSocket Data Received:", message);
+
+                    if (!message || message.trim() === '') {
+                        console.warn("⚠️ Received an empty message.");
+                        return;
+                    }
+
+                    try {
+                        const parsedMessage = JSON.parse(message);
+                        console.log("✅ Parsed WebSocket message:", parsedMessage);
+
+                        if (!parsedMessage.message || !parsedMessage.userId) {
+                            console.warn("⚠️ Invalid notification format:", parsedMessage);
+                            return;
+                        }
+
+                        this.messages.push({
+                            userId: parsedMessage.userId || '',
+                            message: parsedMessage.message || 'No message content',
+                            type: parsedMessage.type || 'info',
+                            contentId: parsedMessage.contentId || '',
+                        });
+
+                        console.log("📌 Updated messages:", this.messages);
+                        this.unreadCount++;
+                    } catch (error) {
+                        console.error("❌ Error parsing WebSocket message:", error);
+                    }
+                });
+
+            }, 1000);
             return;
         }
 
-        this.notificationService.initializeWebSocketConnection(this.userId);
 
-        this.notificationService.getMessages().subscribe((message: string) => {
-            if (!message || message.trim() === '') {
-                console.warn('Received an empty message.');
-                return;
-            }
-
-            try {
-                const parsedMessage = JSON.parse(message);
-                const formattedMessage: NotificationRequestDto = {
-                    userId: parsedMessage.userId || '',
-                    message: parsedMessage.message || 'No message content',
-                    type: parsedMessage.type || 'info'
-                };
-
-                this.messages.push(formattedMessage);
-                this.unreadCount++;
-            } catch (error) {
-                console.error('Error parsing WebSocket message:', error);
-            }
-        });
     }
 
     toggleNotifications(): void {
@@ -75,6 +97,8 @@ export class NotificationComponent implements OnInit {
     }
 
     navigateToMessageDetail(id: string): void {
-        this.router.navigate(['/message', id]);
+        console.log("🔍 Navigating to message detail:", id);
+        
+        this.router.navigate(['/post', id]);
     }
 }
