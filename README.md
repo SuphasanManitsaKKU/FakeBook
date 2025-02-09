@@ -44,5 +44,18 @@ Fakebook ช่วยให้ผู้ใช้สามารถ:
 #### 🚀 **Backend (Spring Boot)**
 1. Clone the repository:
    ```bash
-   git clone https://github.com/SuphasanManitsaKKU/intern.git
+   git clone https://github.com/SuphasanManitsaKKU/FakeBook.git
    cd Fakebook/backend
+   ./mvnw clean install
+   cd ../frontend
+   npm i
+
+2. Run:
+```bash
+   run backend ด้วยคำสั้ง
+   
+   ./mvnw spring-boot:run
+   
+   run fornt end  ด้วยคำสั้ง
+   
+   npm run start
