@@ -8,7 +8,8 @@ import { Message } from '../../../type';
   providedIn: 'root',
 })
 export class ChatService {
-  private apiUrl = 'http://localhost:8080/api/chat';
+  private apiUrl = 'http://localhost:80/api/chat';
+  // private apiUrl = 'http://localhost:8080/api/chat';
   private stompClient!: Client;
   private messagesSubject = new BehaviorSubject<any[]>([]);
   public messages$ = this.messagesSubject.asObservable();
@@ -19,7 +20,8 @@ export class ChatService {
 
   private initializeWebSocketConnection(): void {
     this.stompClient = new Client({
-      brokerURL: 'ws://localhost:8080/ws',
+      brokerURL: 'ws://localhost:80/api/ws',
+      // brokerURL: 'ws://localhost:8080/ws',
       reconnectDelay: 5000,
       debug: (str) => {
         console.log(str);

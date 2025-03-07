@@ -9,6 +9,9 @@ import { SearchComponent } from '../search/search.component';
 
 import { UserPublicService } from '../../services/userPublic/userPublic.service';
 import { UserService } from '../../services/auth/user/user.service'; 
+
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faCommentDots } from '@fortawesome/free-solid-svg-icons';
 // ↑ Inject UserService เพื่อเรียก getUserById()
 
 @Component({
@@ -19,13 +22,15 @@ import { UserService } from '../../services/auth/user/user.service';
     NotificationComponent,
     LogoutComponent,
     CommonModule,
-    FormsModule
+    FormsModule,
+    FontAwesomeModule
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
-  
+  faCommentDots = faCommentDots;
+
   // ควบคุมการเปิด/ปิดเมนูของโปรไฟล์
   isProfileMenuOpen = false;
 

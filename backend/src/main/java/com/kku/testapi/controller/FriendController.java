@@ -9,7 +9,7 @@ import com.kku.testapi.entity.User;
 import com.kku.testapi.service.FriendServiceAction;
 
 @RestController
-@RequestMapping("/api/friends")
+@RequestMapping("/friends")
 public class FriendController {
 
     @Autowired

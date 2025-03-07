@@ -7,7 +7,7 @@
         <ul class="space-y-2">
             <li *ngFor="let friend of friends" (click)="selectFriend(friend.id)"
                 class="flex items-center gap-4 p-2 rounded-lg bg-gray-200 hover:bg-blue-200 cursor-pointer transition text-gray-700">
-                <img [src]="friend.imageProfile || 'favicon.ico'" alt="{{ friend.username }}"
+                <img [src]="friend.imageProfile || 'default-profile.png'" alt="{{ friend.username }}"
                     class="w-10 h-10 rounded-full object-cover" />
                 <span>{{ friend.username }}</span>
             </li>

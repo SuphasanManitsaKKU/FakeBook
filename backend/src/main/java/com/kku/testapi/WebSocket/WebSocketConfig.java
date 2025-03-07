@@ -1,5 +1,6 @@
 package com.kku.testapi.WebSocket;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -8,20 +9,23 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements
-        WebSocketMessageBrokerConfigurer {
-    @Override
-    public void configureMessageBroker(@SuppressWarnings("null") MessageBrokerRegistry config) {
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-        // config.enableSimpleBroker("/notification","/room");
-        config.enableSimpleBroker("/notification","/room");
-        // config.enableSimpleBroker("/room");
-        config.setApplicationDestinationPrefixes("/app");
+    @Value("${FRONTEND_URL:http://localhost:4200}") // โหลดค่า FRONTEND_URL จาก .env
+    private String frontendUrl;
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/notification", "/room"); // เปิด Message Broker สำหรับ notification และ room
+        config.setApplicationDestinationPrefixes("/app"); // Prefix สำหรับการส่ง message
     }
 
     @Override
-    public void registerStompEndpoints(@SuppressWarnings("null") StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:4200");
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        System.out.println("--------------------");
+        System.out.println(frontendUrl);
+        System.out.println("--------------------");
+        registry.addEndpoint("/api/ws")
+                .setAllowedOrigins(frontendUrl); // ใช้ค่า FRONTEND_URL จาก .env
     }
 }

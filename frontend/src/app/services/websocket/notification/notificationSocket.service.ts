@@ -23,7 +23,8 @@ export class NotificationServiceSocket {
         }
 
         this.stompClient = new Client({
-            brokerURL: 'ws://localhost:8080/ws',
+            brokerURL: 'ws://localhost:80/api/ws',
+            // brokerURL: 'ws://localhost:8080/ws',
             reconnectDelay: 5000,
             debug: (str) => console.log(str),
         });

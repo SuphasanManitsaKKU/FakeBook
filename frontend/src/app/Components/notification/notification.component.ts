@@ -6,14 +6,19 @@ import { NotificationServiceSocket } from '../../services/websocket/notification
 import { NotificationRequestDto } from '../../type';
 import { NotificationService } from '../../services/auth/notification/notification.service';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
+
 @Component({
     selector: 'app-notification',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule,FontAwesomeModule],
     templateUrl: './notification.component.html',
     styleUrls: ['./notification.component.css']
 })
 export class NotificationComponent implements OnInit {
+    faBell = faBell;
+    
     messages: NotificationRequestDto[] = [];
     unreadCount: number = 0;
     isDropdownVisible: boolean = false;
@@ -23,7 +28,7 @@ export class NotificationComponent implements OnInit {
         private userPublicService: UserPublicService,
         private notificationServiceSocket: NotificationServiceSocket,
         private router: Router,
-        private notificationService: NotificationService
+        private notificationService: NotificationService,
     ) { }
 
     ngOnInit(): void {

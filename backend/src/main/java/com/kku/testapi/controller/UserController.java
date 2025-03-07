@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.nio.file.*;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
     private static final String UPLOAD_DIR = "public/assets/";
 
