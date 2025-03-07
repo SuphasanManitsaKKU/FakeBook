@@ -3,7 +3,7 @@
 <div class="bg-gray-50 min-h-screen p-6">
 
     <!-- Grid หลัก แบ่งเป็น 12 คอลัมน์ -->
-    <div class="grid grid-cols-12 gap-6">
+    <div class="grid grid-cols-12 gap-5">
 
         <!-- Left Column (col-span-3): Friend Requests & Friends List -->
         <div class="col-span-12 lg:col-span-3 space-y-4">
@@ -58,9 +58,13 @@
                     <div *ngFor="let friend of friendsList"
                         class="flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded-md transition"
                         (click)="goToUserDetail(friend.id)">
+
+                        <!-- ✅ Profile Image -->
                         <img [src]="friend.imageProfile || 'default-profile.png'" alt="Profile"
-                            class="w-8 h-8 object-cover rounded-full mr-2" />
-                        <span class="text-gray-700">
+                            class="w-10 h-10 object-cover rounded-full border border-gray-300 shadow-sm" />
+
+                        <!-- ✅ Username (อยู่ตรงกลาง) -->
+                        <span class="flex-grow text-center text-gray-700 font-medium">
                             {{ friend.username }}
                         </span>
                     </div>
@@ -70,46 +74,47 @@
         </div>
 
         <!-- Center Column (col-span-6): Feed Home -->
-        <div class="col-span-12 lg:col-span-6">
+        <div class="col-span-12 lg:col-span-5">
             <app-feed-home></app-feed-home>
         </div>
 
         <!-- Right Column (col-span-3): All Users -->
-        <div class="col-span-12 lg:col-span-3 space-y-4">
-            <div class="container mx-auto p-6 max-w-4xl">
+        <div class="col-span-12 lg:col-span-4 space-y-4">
+            
+            <div class="space-y-4 bg-white shadow rounded-lg p-4">
                 <h2 class="text-2xl font-bold text-indigo-600 text-center">รายชื่อผู้ใช้ทั้งหมด</h2>
+                <div *ngFor="let user of users"
+                    class="flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded-md transition"
+                    (click)="goToUserDetail(user.id)">
 
-                <div class="mt-6 space-y-4">
-                    <div *ngFor="let user of users"
-                        class="flex items-center justify-between bg-gray-100 shadow hover:bg-gray-100 p-2 rounded-md transition"
-                        (click)="goToUserDetail(user.id)">
+                    <!-- ✅ Avatar -->
+                    <img [src]="user.imageProfile || 'default-profile.png'" alt="Profile Image"
+                        class="w-8 h-8 object-cover rounded-full mr-2">
 
-                        <!-- ✅ ข้อมูลผู้ใช้ -->
-                        <div class="flex items-center gap-3">
-                            <img [src]="user.imageProfile || 'default-profile.png'" alt="Profile Image"
-                                class="w-10 h-10 rounded-full border">
-                            <div>
-                                <p class="font-semibold text-gray-800">{{ user.username }}</p>
-                            </div>
-                        </div>
+                    <!-- ✅ ชื่อ + สถานะ -->
+                    <div class="flex flex-col flex-grow">
+                        <p class="font-semibold text-gray-900 text-center">{{ user.username }}</p>
 
-                        <!-- ✅ ปุ่มเพิ่มเพื่อน -->
-                        <div>
-                            <!-- 🟢 ปุ่มเพิ่มเพื่อน ถ้ายังไม่เป็นเพื่อนและยังไม่ได้ส่งคำขอ -->
-                            <button *ngIf="!isFriend(user.id) && !isPendingRequest(user.id)"
-                                (click)="addFriend(user.id); $event.stopPropagation()"
-                                class="px-3 py-1 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 transition">
-                                +
-                            </button>
+                        <!-- ✅ ถ้ามีคำขอจาก user นี้ให้แสดง "กำลังขอเป็นเพื่อน" -->
+                        <p *ngIf="hasSentFriendRequest(user.id)" class="text-yellow-500 text-sm">
+                            กำลังขอเป็นเพื่อน...</p>
 
-                            <!-- ⏳ แสดงข้อความ "รอการตอบรับ" ถ้าส่งคำขอไปแล้ว -->
-                            <p *ngIf="isPendingRequest(user.id)" class="text-gray-500 text-sm">รอการตอบรับ...</p>
-                        </div>
+                        <!-- ✅ ถ้าเราส่งคำขอไปแล้ว แสดง "รอการตอบรับ..." -->
+                        <p *ngIf="isPendingRequest(user.id)" class="text-gray-500 text-sm">รอการตอบรับ...</p>
                     </div>
+
+                    <!-- ✅ ปุ่มเพิ่มเพื่อน -->
+                    <div class="h-6 flex items-center">
+                        <button
+                            *ngIf="!isFriend(user.id) && !isPendingRequest(user.id) && !hasSentFriendRequest(user.id)"
+                            (click)="addFriend(user.id); $event.stopPropagation()"
+                            class="px-3 py-1 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600 transition">
+                            +
+                        </button>
+                    </div>
+
                 </div>
             </div>
-
         </div>
-
     </div>
 </div>

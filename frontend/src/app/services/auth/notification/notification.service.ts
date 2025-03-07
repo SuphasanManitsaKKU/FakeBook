@@ -20,6 +20,6 @@ export class NotificationService {
 
   // ✅ อัปเดตการแจ้งเตือนเป็น "อ่านแล้ว"
   markAsRead(notificationId: number): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/notifications/${notificationId}`, null, { withCredentials: true });
+    return this.http.put<void>(`${this.apiUrl}/notifications/${notificationId}`, { withCredentials: true });
   }
 }

@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FeedUserComponent } from '../../Components/feed-user/feed-user.component';
 import { User } from '../../type';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-user-detail',
@@ -35,7 +36,7 @@ export class UserDetailComponent implements OnInit {
   selectedProfileImage: File | null = null;
   selectedCoverImage: File | null = null;
 
-  constructor(private route: ActivatedRoute, private userService: UserService, private userPublicService: UserPublicService,private router: Router,) {}
+  constructor(private route: ActivatedRoute, private userService: UserService, private userPublicService: UserPublicService, private router: Router,) { }
 
   ngOnInit(): void {
     this.loggedInUserId = this.userPublicService.getUserId();
@@ -124,6 +125,15 @@ export class UserDetailComponent implements OnInit {
         this.loadUserProfile();
       },
       error: (err) => console.error('❌ บันทึกข้อมูลล้มเหลว:', err)
+    });
+
+    Swal.fire({
+      title: 'ส่งคำขอเป็นเพื่อนสำเร็จ!',
+      icon: 'success',
+      timer: 1500,  // ✅ 1.5 วินาที
+      showConfirmButton: false
+    }).then(() => {
+      window.location.reload();
     });
   }
 

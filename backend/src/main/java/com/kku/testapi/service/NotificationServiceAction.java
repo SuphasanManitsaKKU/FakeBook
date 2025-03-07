@@ -71,13 +71,15 @@ public class NotificationServiceAction implements NotificationService {
 
     public List<NotificationRequestDto> getNotificationsByUserId(Integer userId) {
         List<Notification> notifications = notificationRepository.findByReceiverIdOrderByIdDesc(userId);
-
+    
         return notifications.stream().map(notification -> {
             NotificationRequestDto dto = new NotificationRequestDto();
+            dto.setNotificationId(notification.getId()); // ✅ เพิ่ม notificationId
             dto.setUserId(notification.getReceiver().getId().toString());
             dto.setMessage(generateMessage(notification));
             dto.setType(notification.getType().name());
             dto.setContentId(notification.getContentId());
+            dto.setStatus(notification.getStatus()); // ✅ คง status เป็น Byte
             return dto;
         }).collect(Collectors.toList());
     }

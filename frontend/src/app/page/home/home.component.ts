@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FriendService } from '../../services/auth/friend/friend.service';
 import { UserPublicService } from '../../services/userPublic/userPublic.service';
-import { User, FriendRequest } from '../../type';  
+import { User, FriendRequest } from '../../type';
 import { UserService } from '../../services/auth/user/user.service';
 import { FeedHomeComponent } from "../../Components/feed-home/feed-home.component";
 import { CommonModule } from '@angular/common';
@@ -27,10 +27,10 @@ export class HomeComponent implements OnInit {
     private userPublicService: UserPublicService,
     private userService: UserService,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.loggedInUserId = this.userPublicService.getUserId(); 
+    this.loggedInUserId = this.userPublicService.getUserId();
     this.loadAllUsers();
     this.loadFriends();
     this.loadPendingRequests();
@@ -90,6 +90,11 @@ export class HomeComponent implements OnInit {
     return this.pendingRequests.includes(userId);
   }
 
+  /** ✅ ตรวจสอบว่า user ส่งคำขอมาให้เราหรือไม่ */
+  hasSentFriendRequest(userId: number): boolean {
+    return this.friendRequests.some(fr => fr.sender.id === userId);
+  }
+
   /** ✅ ส่งคำขอเป็นเพื่อน */
   addFriend(userId: number): void {
     if (!this.loggedInUserId) return;
@@ -97,6 +102,7 @@ export class HomeComponent implements OnInit {
       next: () => {
         console.log('ส่งคำขอเป็นเพื่อนสำเร็จ');
         this.pendingRequests.push(userId);
+        window.location.reload(); // ✅ รีโหลดหน้าเว็บ
       },
       error: (err) => console.error('ส่งคำขอเป็นเพื่อนล้มเหลว:', err)
     });

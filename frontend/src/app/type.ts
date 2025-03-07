@@ -124,7 +124,9 @@ export interface ShareResponse {
 
 export interface NotificationRequestDto {
     userId: string; // ใช้ string แทน String
+    notificationId: number;
     message: string; // ใช้ string แทน String
     type: string;    // ใช้ string แทน String
     contentId: string; // ใช้ number แทน Number
+    status: number;
 }

@@ -2,17 +2,26 @@ package com.kku.testapi.dto;
 
 public class NotificationRequestDto {
     private String userId;
+    private Integer notificationId;
     private String message;
-    private String type;  // เพิ่มฟิลด์ type
-    private Integer contentId;  // เพิ่มฟิลด์ contentId
+    private String type;
+    private Integer contentId;
+    private Byte status; // ✅ เพิ่มฟิลด์ status
 
-    // Getters และ Setters
     public String getUserId() {
         return userId;
     }
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public Integer getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(Integer notificationId) {
+        this.notificationId = notificationId;
     }
 
     public String getMessage() {
@@ -38,4 +47,13 @@ public class NotificationRequestDto {
     public void setContentId(Integer contentId) {
         this.contentId = contentId;
     }
+
+    public Byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
 }
