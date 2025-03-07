@@ -17,8 +17,12 @@
         </div>
     </div>
 
+    <!-- ✅ ถ้ายังไม่มีเพื่อนถูกเลือกให้แสดงข้อความ -->
+    <div *ngIf="!currentChatRoomId" class="flex justify-center items-center flex-grow text-gray-500 text-lg">
+        <p>โปรดเลือกแชทที่จะคุย</p>
+    </div>
     <!-- Chat Window -->
-    <div class="w-full md:w-3/4 bg-white p-4 rounded-lg shadow flex flex-col">
+    <div *ngIf="currentChatRoomId" class="w-full md:w-3/4 bg-white p-4 rounded-lg shadow flex flex-col">
         <!-- Messages Area -->
         <div #chatContainer class="flex-grow overflow-y-auto flex flex-col-reverse space-y-reverse border-b pb-4">
             <div *ngFor="let msg of chatMessages" class="flex">

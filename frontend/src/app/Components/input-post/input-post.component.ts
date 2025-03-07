@@ -2,9 +2,9 @@ import { Component, EventEmitter, OnInit, Output, ViewChild, ElementRef } from '
 import Swal from 'sweetalert2';
 import { PostService } from '../../services/auth/post/post.service';
 import { UserPublicService } from './../../services/userPublic/userPublic.service';
-import { PostDTO } from '../../type';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-input-post',
@@ -13,14 +13,13 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./input-post.component.css']
 })
 export class InputPostComponent implements OnInit {
-  isModalOpen: boolean = false;
-  postContent: string = '';
-  userId: number = 0;
-
   @Output() postCreated = new EventEmitter<void>();
-
-  // ⭐ เพิ่ม ViewChild เพื่อติดตาม `<input>` ใน Template
   @ViewChild('postContentInput') postContentInput!: ElementRef<HTMLInputElement>;
+
+  isModalOpen = false;
+  isPosting = false;
+  postContent = '';
+  userId = 0;
 
   constructor(
     private postService: PostService,
@@ -31,44 +30,44 @@ export class InputPostComponent implements OnInit {
     this.userId = this.userPublicService.getUserId();
   }
 
-  openModal() {
+  openModal(): void {
     this.isModalOpen = true;
-    // ⭐ ใช้ setTimeout เพื่อให้ DOM อัปเดตแล้วค่อย focus
-    setTimeout(() => {
-      this.postContentInput.nativeElement.focus();
-    }, 1);
+    setTimeout(() => this.postContentInput?.nativeElement.focus(), 1);
   }
 
-  closeModal() {
+  closeModal(): void {
     this.isModalOpen = false;
+    this.postContent = ''; // ✅ ล้างค่าเมื่อปิด Modal
   }
 
-  post() {
-    if (!this.postContent.trim()) return;
+  async post(event?: Event): Promise<void> {
+    event?.preventDefault(); // ✅ ป้องกัน Default Form Submit
 
-    const postDTO: PostDTO = {
-      content: this.postContent,
-      userId: this.userId
-    };
+    if (this.isPosting || !this.postContent.trim()) return;
+    this.isPosting = true;
 
-    this.postService.createPost(postDTO).subscribe(
-      () => {
-        Swal.fire({
-          icon: 'success',
-          title: 'โพสต์สำเร็จ!',
-          text: 'โพสต์ของคุณได้ถูกสร้างเรียบร้อยแล้ว'
-        });
-        this.closeModal();
-        this.postCreated.emit();
-        this.postContent = '';
-      },
-      () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'เกิดข้อผิดพลาด!',
-          text: 'ไม่สามารถโพสต์ได้ โปรดลองใหม่อีกครั้ง'
-        });
-      }
-    );
+    try {
+      await firstValueFrom(this.postService.createPost({ content: this.postContent, userId: this.userId }));
+
+      Swal.fire({
+        icon: 'success',
+        title: 'โพสต์สำเร็จ!',
+        text: 'โพสต์ของคุณถูกสร้างแล้ว',
+        timer: 1500,
+        showConfirmButton: false
+      });
+
+      this.closeModal();
+      this.postCreated.emit();
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด!',
+        text: 'ไม่สามารถโพสต์ได้ โปรดลองใหม่อีกครั้ง'
+      });
+      console.error('❌ Error posting:', error);
+    } finally {
+      this.isPosting = false;
+    }
   }
 }

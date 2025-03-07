@@ -2,10 +2,19 @@ package com.kku.testapi.dto;
 
 public class CommentRequestDTO {
 
+    private Integer id;
     private Integer postId;
     private String message;
     private Integer userId;
     private Integer parentCommentId; // เพิ่มฟิลด์สำหรับ parent comment
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public Integer getPostId() {
         return postId;

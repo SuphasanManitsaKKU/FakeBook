@@ -169,62 +169,76 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/upload-profile")
-    public ResponseEntity<String> uploadProfileImage(@PathVariable Integer userId,
+    public ResponseEntity<Map<String, String>> uploadProfileImage(@PathVariable Integer userId,
             @RequestParam("file") MultipartFile file) {
+        Map<String, String> response = new HashMap<>();
         try {
             if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body("File is empty.");
+                response.put("error", "File is empty.");
+                return ResponseEntity.badRequest().body(response);
             }
 
-            // ✅ ดึงนามสกุลไฟล์ เช่น ".png", ".jpg"
+            // ✅ ตรวจสอบโฟลเดอร์ UPLOAD_DIR
+            File uploadDir = new File(UPLOAD_DIR);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+
             String originalFilename = file.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-
-            // ✅ สร้างชื่อไฟล์ใหม่แบบสุ่ม เช่น "profile_1_9f3d6a7b.png"
             String filename = "profile_" + userId + "_" + UUID.randomUUID() + extension;
-            Path path = Paths.get(UPLOAD_DIR + filename);
+            Path path = Paths.get(UPLOAD_DIR, filename);
 
-            // ✅ บันทึกไฟล์ลงโฟลเดอร์ `public/assets/`
-            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            Files.write(path, file.getBytes());
 
-            // ✅ เก็บ Path ของไฟล์ลงฐานข้อมูล เช่น "/assets/profile_1_xxx.png"
             String filePath = "/assets/" + filename;
-            System.out.println(filePath);
-            userService.updateProfileImage(userId, filePath); // ✅ บันทึกลง DB
+            userService.updateProfileImage(userId, filePath);
 
-            return ResponseEntity.ok(filePath); // ✅ ส่ง Path กลับไปให้ Frontend ใช้
+            // ✅ ส่ง JSON Response กลับไป
+            response.put("message", "Upload successful");
+            response.put("filePath", filePath);
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error uploading file: " + e.getMessage());
+            response.put("error", "Error uploading file: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
         }
     }
 
     @PostMapping("/{userId}/upload-cover")
-    public ResponseEntity<String> uploadCoverImage(@PathVariable Integer userId,
+    public ResponseEntity<Map<String, String>> uploadCoverImage(@PathVariable Integer userId,
             @RequestParam("file") MultipartFile file) {
+        Map<String, String> response = new HashMap<>();
         try {
             if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body("File is empty.");
+                response.put("error", "File is empty.");
+                return ResponseEntity.badRequest().body(response);
             }
 
-            // ✅ ดึงนามสกุลไฟล์ เช่น ".png", ".jpg"
+            // ✅ ตรวจสอบโฟลเดอร์ UPLOAD_DIR
+            File uploadDir = new File(UPLOAD_DIR);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+
             String originalFilename = file.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String filename = "cover_" + userId + "_" + UUID.randomUUID() + extension;
+            Path path = Paths.get(UPLOAD_DIR, filename);
 
-            // ✅ สร้างชื่อไฟล์ใหม่แบบสุ่ม เช่น "profile_1_9f3d6a7b.png"
-            String filename = "profile_" + userId + "_" + UUID.randomUUID() + extension;
-            Path path = Paths.get(UPLOAD_DIR + filename);
+            Files.write(path, file.getBytes());
 
-            // ✅ บันทึกไฟล์ลงโฟลเดอร์ `public/assets/`
-            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-
-            // ✅ เก็บ Path ของไฟล์ลงฐานข้อมูล เช่น "/assets/profile_1_xxx.png"
             String filePath = "/assets/" + filename;
-            userService.updateCoverImage(userId, filePath); // ✅ ใช้เมธอดใหม่
+            userService.updateCoverImage(userId, filePath);
 
-            return ResponseEntity.ok(filePath);
+            // ✅ ส่ง JSON Response กลับไป
+            response.put("message", "Upload successful");
+            response.put("filePath", filePath);
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error uploading file: " + e.getMessage());
+            response.put("error", "Error uploading file: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
         }
     }
-
 }

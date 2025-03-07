@@ -18,7 +18,6 @@ export interface Comment {
     post: Post;
     user: User;
     parentComment: Comment | null; // Null หมายถึงเป็นคอมเมนต์หลัก
-    level?: number; // ✅ เพิ่ม level เข้าไปให้รองรับความลึก
 }
 
 export interface ChatRoom {
@@ -92,10 +91,10 @@ export interface PostResponseDTO {
 
 // comment-request-dto.interface.ts
 export interface CommentRequestDTO {
-    postId: number;
     message: string;
+    postId: number;
     userId: number;
-    parentCommentId: number | null;
+    parentCommentId?: number | null;
 }
 
 // post-response-dto.interface.ts

@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { FeedUserComponent } from '../../Components/feed-user/feed-user.component';
 import { User } from '../../type';
 import Swal from 'sweetalert2';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-user-detail',
@@ -60,7 +61,12 @@ export class UserDetailComponent implements OnInit {
   toggleEditMode(): void {
     if (!this.isOwner) return;
     this.isEditing = !this.isEditing;
-    if (!this.isEditing) {
+
+    if (this.isEditing) {
+      // ✅ คัดลอกค่าปัจจุบันไปที่ editData
+      this.editData = { ...this.userData };
+    } else {
+      // ✅ รีเซ็ตค่าถ้ากดยกเลิก
       this.selectedProfileImage = null;
       this.selectedCoverImage = null;
     }
@@ -93,48 +99,59 @@ export class UserDetailComponent implements OnInit {
   }
 
   /** ✅ บันทึกข้อมูลโปรไฟล์ */
-  saveProfile(): void {
+  async saveProfile(): Promise<void> {
+    console.log('🚀 กำลังบันทึกข้อมูลโปรไฟล์...');
+
     if (!this.isOwner) return;
 
     const updatedUser: User = {
+      id: this.loggedInUserId!,
       username: this.editData.username,
       bio: this.editData.bio,
       gender: this.editData.gender,
       location: this.editData.location,
       birthday: this.editData.birthday,
-      id: this.loggedInUserId!,
       email: '',
       password: '',
       imageProfile: null,
       coverImage: null
     };
 
-    this.userService.updateUserProfile(this.userId!, updatedUser).subscribe({
-      next: () => {
-        console.log('✅ บันทึกข้อมูลโปรไฟล์สำเร็จ');
+    try {
+      await firstValueFrom(this.userService.updateUserProfile(this.userId!, updatedUser));
 
-        if (this.selectedProfileImage) {
-          this.userService.uploadProfileImage(this.userId!, this.selectedProfileImage).subscribe();
-        }
+      // ✅ Upload Profile Image ก่อน
+      if (this.selectedProfileImage) {
+        console.log('📤 Uploading profile image...');
+        await firstValueFrom(this.userService.uploadProfileImage(this.userId!, this.selectedProfileImage));
+      }
 
-        if (this.selectedCoverImage) {
-          this.userService.uploadCoverImage(this.userId!, this.selectedCoverImage).subscribe();
-        }
+      // ✅ Upload Cover Image หลังจากนั้น
+      if (this.selectedCoverImage) {
+        console.log('📤 Uploading cover image...');
+        await firstValueFrom(this.userService.uploadCoverImage(this.userId!, this.selectedCoverImage));
+      }
 
-        this.isEditing = false;
-        this.loadUserProfile();
-      },
-      error: (err) => console.error('❌ บันทึกข้อมูลล้มเหลว:', err)
-    });
+      // ✅ โหลดข้อมูลใหม่
+      setTimeout(() => this.loadUserProfile(), 1000);
 
-    Swal.fire({
-      title: 'ส่งคำขอเป็นเพื่อนสำเร็จ!',
-      icon: 'success',
-      timer: 1500,  // ✅ 1.5 วินาที
-      showConfirmButton: false
-    }).then(() => {
+      Swal.fire({
+        title: 'บันทึกข้อมูลสำเร็จ!',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
+
       window.location.reload();
-    });
+
+    } catch (err) {
+      console.error('❌ บันทึกข้อมูลล้มเหลว:', err);
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        text: 'ไม่สามารถบันทึกโปรไฟล์ได้',
+        icon: 'error',
+      });
+    }
   }
 
   goToHHome() {

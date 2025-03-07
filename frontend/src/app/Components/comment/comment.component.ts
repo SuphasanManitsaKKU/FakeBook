@@ -22,35 +22,34 @@ export class CommentComponent implements OnInit {
   @Output() commentAdded = new EventEmitter<void>();
   @Output() commentDeleted = new EventEmitter<void>();
 
-  comments: Comment[] = [];         
-  parentComments: Comment[] = [];   
-  repliesMap: { [key: number]: Comment[] } = {}; 
+  comments: Comment[] = [];
+  parentComments: Comment[] = [];
+  repliesMap: { [key: number]: Comment[] } = {};
 
   replyingToCommentId: number | null = null;
   editingCommentId: number | null = null;
   editedMessage: string = '';
   userId: number = 0;
-  
-  constructor(private commentService: CommentService, private userPublicService: UserPublicService) { }
+
+  constructor(
+    private commentService: CommentService,
+    private userPublicService: UserPublicService
+  ) { }
 
   ngOnInit(): void {
-    this.userId = this.userPublicService.getUserId(); // ✅ ดึง userId ของผู้ใช้ที่ล็อกอิน
+    this.userId = this.userPublicService.getUserId();
     this.loadComments();
   }
 
-  /**
-   * โหลดคอมเมนต์ของ `postId` และ `parentCommentId`
-   */
+  /** ✅ โหลดคอมเมนต์ */
   loadComments(): void {
     this.commentService.getCommentsByPost(this.postId).subscribe((comments) => {
       this.comments = comments;
-      this.organizeComments();
+      this.organizeComments(); // ✅ แยก Parent และ Replies
     });
   }
 
-  /**
-   * แยก Parent Comments กับ Replies
-   */
+  /** ✅ แยก Parent Comments และ Replies */
   private organizeComments(): void {
     this.parentComments = this.comments.filter((comment) => !comment.parentComment);
     this.repliesMap = {};
@@ -64,6 +63,16 @@ export class CommentComponent implements OnInit {
         this.repliesMap[parentId].push(comment);
       }
     });
+  }
+
+  /** ✅ เช็คระดับความลึกของคอมเมนต์ (Max 3 ชั้น) */
+  getCommentDepth(comment: Comment): number {
+    let depth = 1;
+    while (comment.parentComment) {
+      depth++;
+      comment = comment.parentComment;
+    }
+    return depth;
   }
 
   startReply(commentId: number): void {
@@ -122,5 +131,13 @@ export class CommentComponent implements OnInit {
     this.loadComments();
     this.stopReply();
     this.commentAdded.emit();
+  }
+
+  getNestedComments(parentCommentId: number): Comment[] {
+    let nestedComments: Comment[] = [];
+    this.commentService.getNestedComments(parentCommentId).subscribe((comments) => {
+      nestedComments = comments;
+    });
+    return nestedComments;
   }
 }
