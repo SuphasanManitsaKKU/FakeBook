@@ -108,6 +108,7 @@ export class HomeComponent implements OnInit {
       next: () => {
         this.friendRequests = this.friendRequests.filter(r => r.id !== requestId);
         this.loadFriends(); // ✅ โหลดเพื่อนใหม่
+        window.location.reload(); // ✅ รีโหลดหน้าเว็บ
       },
       error: (err) => console.log(err),
     });
