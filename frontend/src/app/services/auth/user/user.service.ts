@@ -22,8 +22,8 @@ export class UserService {
     register(username: string, email: string, password: string): Observable<any> {
         console.log('Registering...');
         console.log(this.apiUrl);
-        
-        
+
+
         const body = { username, email, password };
         return this.http.post(`${this.apiUrl}/users/register`, body);
     }
@@ -68,5 +68,13 @@ export class UserService {
         const formData = new FormData();
         formData.append('file', file);
         return this.http.post<string>(`${this.apiUrl}/users/${userId}/upload-cover`, formData, { withCredentials: true });
+    }
+
+    // ✅ ฟังก์ชันสำหรับค้นหาผู้ใช้
+    searchUsers(username: string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/users/search`, {
+            params: { username: username },
+            withCredentials: true, // เปิดใช้งานการส่ง Cookie
+        });
     }
 }

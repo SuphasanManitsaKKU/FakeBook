@@ -45,16 +45,6 @@ public class UserController {
         return ResponseEntity.ok("Notification sent to user ID: " + request.getUserId());
     }
 
-    @GetMapping("")
-    public String home() {
-        return "Hello World";
-    }
-
-    @GetMapping("/test")
-    public String fff() {
-        return "Hello World test";
-    }
-
     // ✅ Login และสร้าง JWT
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody User user) {

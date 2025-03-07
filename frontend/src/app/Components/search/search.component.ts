@@ -1,3 +1,4 @@
+import { UserService } from './../../services/auth/user/user.service';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,16 +17,17 @@ export class SearchComponent {
   loading: boolean = false;
   error: string | null = null; // เพิ่ม error สำหรับการจัดการข้อผิดพลาด
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private userService: UserService
+  ) { }
 
   searchUsers(): void {
     this.loading = true;
     this.error = null; // ล้างข้อผิดพลาดก่อนการค้นหา
 
-    this.http.get<any[]>(`http://localhost:8080/api/users/search`, {
-      params: { username: this.username },
-      withCredentials: true, // เปิดใช้งานการส่ง Cookie
-    })
+    this.userService.searchUsers(this.username)
       .subscribe({
         next: (users) => {
           this.users = users;
