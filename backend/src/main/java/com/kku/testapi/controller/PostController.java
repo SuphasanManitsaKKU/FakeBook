@@ -74,7 +74,7 @@ public class PostController {
 
         // 🔹 แปลงเป็น `PostResponseDTO` แล้วส่งกลับ
         PostResponseDTO responseDTO = postService.convertToPostResponseDTO(updatedPost);
-        
+
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -88,5 +88,11 @@ public class PostController {
         List<PostResponseDTO> posts = postService.getUserAndFriendsPosts(userId);
         System.out.println("----------------------------------------------------------------------------9");
         return posts;
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<PostResponseDTO>> getPostsByUser(@PathVariable Integer userId) {
+        List<PostResponseDTO> userPosts = postService.getPostsByUser(userId);
+        return ResponseEntity.ok(userPosts);
     }
 }

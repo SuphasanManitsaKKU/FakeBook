@@ -12,6 +12,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommentComponent } from '../comment/comment.component';
 
+import { environment } from '../../../environments/environment';
+
 @Component({
   selector: 'app-post',
   standalone: true,
@@ -32,6 +34,8 @@ export class PostComponent implements OnInit {
   
   editing: boolean = false;
   editedContent: string = '';
+
+  private apiUrl = environment.apiUrl; // ใช้ API URL จาก environment.ts
 
   constructor(
     private postService: PostService,
@@ -145,7 +149,7 @@ export class PostComponent implements OnInit {
 
   copyLink(): void {
     if (!this.post) return;
-    const postUrl = `http://localhost:4200/post/${this.post.id}`;
+    const postUrl = `${this.apiUrl}/post/${this.post.id}`;
     navigator.clipboard.writeText(postUrl).then(() => {
       Swal.fire('คัดลอกลิงก์แล้ว!', 'คุณสามารถแชร์ลิงก์นี้ให้เพื่อนได้เลย', 'success');
       this.showShareOptions = false;

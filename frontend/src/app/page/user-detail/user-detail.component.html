@@ -1,102 +1,97 @@
-<div class="bg-gray-50 min-h-screen p-6">
-  <!-- ✅ Grid Layout -->
-  <div class="grid grid-cols-12 gap-6">
+<div class="bg-gray-50 min-h-screen p-6 flex flex-col items-center gap-6">
+  <!-- ✅ Profile Container (กว้างเท่า Feed) -->
+  <div class="w-full max-w-3xl mx-auto">
+    <div class="bg-white shadow-md rounded-lg">
 
-    <!-- ✅ Center Column (col-span-6) -->
-    <div class="col-span-12 lg:col-span-6 lg:col-start-4">
-      <div class="container mx-auto p-6 max-w-xl">
-        <!-- ✅ Cover Image -->
-        <div class="relative w-full h-48 bg-gray-200 rounded-lg overflow-hidden shadow-md">
-          <img [src]="userData?.coverImage || 'default-cover.png'" alt="Cover Image"
-            class="w-full h-full object-cover" />
+      <!-- ✅ Cover Image -->
+      <div class="relative w-full h-56 bg-gray-200 rounded-t-lg overflow-hidden">
+        <img [src]="userData?.coverImage || 'default-cover.png'" 
+             alt="Cover Image" 
+             class="w-full h-full object-cover" />
+        <label *ngIf="isOwner && isEditing"
+          class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-3 py-1 text-xs rounded cursor-pointer hover:bg-opacity-70 transition">
+          ✏️ เปลี่ยน Cover
+          <input type="file" (change)="onCoverImageChange($event)" class="hidden">
+        </label>
+      </div>
+
+      <!-- ✅ Profile Image -->
+      <div class="relative text-center -mt-14">
+        <div class="relative inline-block">
+          <img [src]="userData?.imageProfile || 'default-profile.png'" 
+               class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md" />
           <label *ngIf="isOwner && isEditing"
-            class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-3 py-1 text-xs rounded cursor-pointer hover:bg-opacity-70 transition">
-            ✏️ เปลี่ยน Cover
-            <input type="file" (change)="onCoverImageChange($event)" class="hidden">
+            class="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white px-2 py-1 text-xs rounded cursor-pointer hover:bg-opacity-70 transition">
+            ✏️
+            <input type="file" (change)="onProfileImageChange($event)" class="hidden">
           </label>
         </div>
+      </div>
 
-        <div class="bg-white shadow-md rounded-lg p-6 mt-6 relative">
-          <!-- ✅ Profile Image -->
-          <div class="absolute -top-12 left-1/2 transform -translate-x-1/2">
-            <div class="relative">
-              <img [src]="userData?.imageProfile || 'default-profile.png'" alt="Profile Image"
-                class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" />
-              <label *ngIf="isOwner && isEditing"
-                class="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white px-2 py-1 text-xs rounded cursor-pointer hover:bg-opacity-70 transition">
-                ✏️
-                <input type="file" (change)="onProfileImageChange($event)" class="hidden">
-              </label>
-            </div>
-          </div>
+      <!-- ✅ User Info -->
+      <div class="text-center mt-4 px-6">
+        <h2 class="text-2xl font-bold text-gray-800">
+          <span *ngIf="!isEditing">{{ userData?.username }}</span>
+          <input *ngIf="isEditing" type="text" [(ngModel)]="editData.username"
+            class="border border-gray-300 rounded-md px-2 py-1 text-center focus:ring focus:ring-yellow-300">
+        </h2>
+        <p class="text-gray-500">{{ userData?.email }}</p>
+      </div>
 
-          <div class="mt-10 text-center space-y-2">
-            <h2 class="text-2xl font-bold text-gray-800">
-              <span *ngIf="!isEditing">{{ userData?.username }}</span>
-              <input *ngIf="isEditing" type="text" [(ngModel)]="editData.username"
-                class="border border-gray-300 rounded-md px-2 py-1 text-center focus:ring focus:ring-yellow-300">
-            </h2>
-            <p class="text-gray-500">{{ userData?.email }}</p>
-          </div>
-
-          <!-- ✅ ข้อมูลโปรไฟล์ -->
-          <div class="mt-6 bg-gray-50 p-4 rounded-lg shadow-sm">
-            <div class="grid grid-cols-2 gap-4 text-gray-700">
-              <p>
-                <span class="font-semibold">Bio:</span>
-                <span *ngIf="!isEditing">{{ userData?.bio || '-' }}</span>
-                <input *ngIf="isEditing" type="text" [(ngModel)]="editData.bio"
-                  class="border border-gray-300 rounded-md px-2 py-1 w-full focus:ring focus:ring-yellow-300">
-              </p>
-              <p>
-                <span class="font-semibold">Gender:</span>
-                <span *ngIf="!isEditing">{{ userData?.gender || '-' }}</span>
-                <select *ngIf="isEditing" [(ngModel)]="editData.gender"
-                  class="border border-gray-300 rounded-md px-2 py-1 w-full focus:ring focus:ring-yellow-300">
-                  <option value="MALE">Male</option>
-                  <option value="FEMALE">Female</option>
-                  <option value="OTHER">Other</option>
-                </select>
-              </p>
-              <p>
-                <span class="font-semibold">Location:</span>
-                <span *ngIf="!isEditing">{{ userData?.location || '-' }}</span>
-                <input *ngIf="isEditing" type="text" [(ngModel)]="editData.location"
-                  class="border border-gray-300 rounded-md px-2 py-1 w-full focus:ring focus:ring-yellow-300">
-              </p>
-              <p>
-                <span class="font-semibold">Birthday:</span>
-                <span *ngIf="!isEditing">{{ userData?.birthday || '-' }}</span>
-                <input *ngIf="isEditing" type="date" [(ngModel)]="editData.birthday"
-                  class="border border-gray-300 rounded-md px-2 py-1 w-full focus:ring focus:ring-yellow-300">
-              </p>
-            </div>
-          </div>
-
-          <!-- ✅ ปุ่ม Edit & Save -->
-          <div class="mt-6 flex justify-center gap-4">
-            <!-- ถ้าอยู่ในโหมดแก้ไข ให้กดแล้วบันทึก -->
-            <button *ngIf="isEditing" (click)="saveProfile()"
-              class="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">
-              💾 บันทึก
-            </button>
-
-            <!-- ถ้าไม่ได้อยู่ในโหมดแก้ไข ให้กดแล้วแก้ไข -->
-            <button *ngIf="!isEditing" (click)="toggleEditMode()"
-              class="px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition">
-              ✏️ แก้ไขโปรไฟล์
-            </button>
-
-            <button (click)="goToHHome()"
-              class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">
-              ⬅️ กลับ
-            </button>
-          </div>
-
+      <!-- ✅ Profile Details -->
+      <div class="mt-6 bg-gray-50 p-6 rounded-lg shadow-sm">
+        <div class="grid grid-cols-2 gap-4 text-gray-700">
+          <p>
+            <span class="font-semibold">Bio:</span>
+            <span *ngIf="!isEditing">{{ userData?.bio || '-' }}</span>
+            <input *ngIf="isEditing" type="text" [(ngModel)]="editData.bio"
+              class="border border-gray-300 rounded-md px-2 py-1 w-full focus:ring focus:ring-yellow-300">
+          </p>
+          <p>
+            <span class="font-semibold">Gender:</span>
+            <span *ngIf="!isEditing">{{ userData?.gender || '-' }}</span>
+            <select *ngIf="isEditing" [(ngModel)]="editData.gender"
+              class="border border-gray-300 rounded-md px-2 py-1 w-full focus:ring focus:ring-yellow-300">
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </p>
+          <p>
+            <span class="font-semibold">Location:</span>
+            <span *ngIf="!isEditing">{{ userData?.location || '-' }}</span>
+            <input *ngIf="isEditing" type="text" [(ngModel)]="editData.location"
+              class="border border-gray-300 rounded-md px-2 py-1 w-full focus:ring focus:ring-yellow-300">
+          </p>
+          <p>
+            <span class="font-semibold">Birthday:</span>
+            <span *ngIf="!isEditing">{{ userData?.birthday || '-' }}</span>
+            <input *ngIf="isEditing" type="date" [(ngModel)]="editData.birthday"
+              class="border border-gray-300 rounded-md px-2 py-1 w-full focus:ring focus:ring-yellow-300">
+          </p>
         </div>
       </div>
-    </div>
 
+      <!-- ✅ ปุ่ม Edit & Save -->
+      <div class="mt-6 flex justify-center gap-4 pb-6">
+        <button *ngIf="isEditing" (click)="saveProfile()"
+          class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+          💾 บันทึก
+        </button>
+        <button *ngIf="!isEditing" (click)="toggleEditMode()"
+          class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
+          ✏️ แก้ไขโปรไฟล์
+        </button>
+        <button (click)="goToHome()"
+          class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+          ⬅️ กลับ
+        </button>
+      </div>
+    </div>
   </div>
-  <app-feed-user></app-feed-user>
+
+  <!-- ✅ Feed Container (ให้กว้างเท่ากับโปรไฟล์) -->
+  <div class="w-full max-w-3xl mx-auto">
+    <app-feed-user></app-feed-user>
+  </div>
 </div>

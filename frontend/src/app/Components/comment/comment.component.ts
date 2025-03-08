@@ -37,11 +37,13 @@ export class CommentComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log('postId in PostComponent:', this.postId);
+
     this.userId = this.userPublicService.getUserId();
     this.loadComments();
   }
 
-  /** ✅ โหลดคอมเมนต์ */
+  /** ✅ โหลดคอมเมนต์และจัดเก็บโครงสร้างคอมเมนต์ Nested */
   loadComments(): void {
     this.commentService.getCommentsByPost(this.postId).subscribe((comments) => {
       this.comments = comments;
@@ -56,11 +58,10 @@ export class CommentComponent implements OnInit {
 
     this.comments.forEach((comment) => {
       if (comment.parentComment) {
-        const parentId = comment.parentComment.id;
-        if (!this.repliesMap[parentId]) {
-          this.repliesMap[parentId] = [];
+        if (!this.repliesMap[comment.parentComment.id]) {
+          this.repliesMap[comment.parentComment.id] = [];
         }
-        this.repliesMap[parentId].push(comment);
+        this.repliesMap[comment.parentComment.id].push(comment);
       }
     });
   }
@@ -75,37 +76,46 @@ export class CommentComponent implements OnInit {
     return depth;
   }
 
+  /** ✅ เริ่มตอบกลับ */
   startReply(commentId: number): void {
     this.replyingToCommentId = commentId;
   }
 
+  /** ✅ ยกเลิกตอบกลับ */
   stopReply(): void {
     this.replyingToCommentId = null;
   }
 
+  /** ✅ เริ่มแก้ไข */
   startEdit(comment: Comment): void {
     this.editingCommentId = comment.id;
-    this.editedMessage = comment.message;
+    this.editedMessage = comment.message; // โหลดค่าปัจจุบันมาแสดง
   }
 
+  /** ✅ ยกเลิกแก้ไข */
   stopEdit(): void {
     this.editingCommentId = null;
     this.editedMessage = '';
   }
 
+  /** ✅ บันทึกการแก้ไข */
   saveEdit(comment: Comment): void {
     if (this.editedMessage.trim()) {
-      const updatedComment: Comment = {
-        ...comment,
-        message: this.editedMessage,
-      };
-      this.commentService.updateComment(comment.id, updatedComment).subscribe(() => {
-        this.loadComments();
-        this.stopEdit();
-      });
+      const updatedComment: Comment = { ...comment, message: this.editedMessage };
+
+      this.commentService.updateComment(comment.id, updatedComment).subscribe(
+        () => {
+          this.loadComments(); // โหลดคอมเมนต์ใหม่หลังแก้ไข
+          this.stopEdit();
+        },
+        (error) => {
+          console.error('เกิดข้อผิดพลาด:', error);
+        }
+      );
     }
   }
 
+  /** ✅ ลบคอมเมนต์ */
   deleteComment(commentId: number): void {
     Swal.fire({
       title: 'ยืนยันการลบคอมเมนต์?',
@@ -121,23 +131,14 @@ export class CommentComponent implements OnInit {
         this.commentService.deleteComment(commentId).subscribe(() => {
           Swal.fire('ลบสำเร็จ!', 'คอมเมนต์ของคุณถูกลบแล้ว', 'success');
           this.loadComments();
-          this.commentDeleted.emit();
         });
       }
     });
   }
 
+  /** ✅ โหลดคอมเมนต์ใหม่หลังจากตอบกลับ */
   onCommentAddedFromChild(): void {
     this.loadComments();
     this.stopReply();
-    this.commentAdded.emit();
-  }
-
-  getNestedComments(parentCommentId: number): Comment[] {
-    let nestedComments: Comment[] = [];
-    this.commentService.getNestedComments(parentCommentId).subscribe((comments) => {
-      nestedComments = comments;
-    });
-    return nestedComments;
   }
 }

@@ -6,7 +6,7 @@
         class="w-12 h-12 rounded-full mr-3 hover:opacity-80 transition" />
       <div>
         <p class="text-lg font-semibold hover:underline">{{ post?.user?.username }}</p>
-        <p class="text-sm text-gray-500">{{ post?.timestamp | date:'medium' }}</p>
+        <p class="text-sm text-gray-500">{{ post?.timestamp | date:'HH:mm dd/MM/yyyy' }}</p>
       </div>
     </div>
 
@@ -19,9 +19,9 @@
       <div *ngIf="showPostMenu && post?.user?.id == userId"
         class="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-50">
         <button class="block w-full text-left px-4 py-2 text-yellow-500 hover:bg-gray-100" (click)="startEdit()">✏️
-          แก้ไข</button>
+          Edit</button>
         <button class="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100" (click)="deletePost()">🗑️
-          ลบ</button>
+          Delete</button>
       </div>
     </div>
 
@@ -43,16 +43,16 @@
 
   <div class="post-actions flex gap-4 mt-4">
     <button class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600" (click)="toggleLike()">
-      ไดค์ ({{ post?.likeAmount }})
+      Like ({{ post?.likeAmount }})
     </button>
     <button class="bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600" (click)="toggleComments()">
-      แสดงความคิดเห็น ({{ post?.commentAmount }})
+      Comment ({{ post?.commentAmount }})
     </button>
 
     <!-- ปุ่มแชร์ -->
     <div class="relative">
       <button class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600" (click)="toggleShareOptions()">
-        แชร์ ({{ post?.shareAmount }})
+        Share ({{ post?.shareAmount }})
       </button>
       <div *ngIf="showShareOptions" class="absolute bg-white border rounded-md mt-2 shadow-lg p-2 z-50">
         <button class="block w-52 text-left px-2 py-2 hover:bg-gray-200" (click)="copyLink()">📋 คัดลอกลิงก์</button>
@@ -67,6 +67,5 @@
     <!-- เรียก <app-comment> และผูก (commentAdded) กับฟังก์ชันใน PostComponent -->
     <app-comment [postId]="postId" (commentAdded)="onCommentChange()"
       (commentDeleted)="onCommentChange()"></app-comment>
-
   </div>
 </div>

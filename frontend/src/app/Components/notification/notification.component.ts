@@ -106,7 +106,7 @@ export class NotificationComponent implements OnInit {
         }
     }
 
-    navigateToMessageDetail(userId: string, notificationId: number, index: number): void {
+    navigateToMessageDetail(contentId: string, notificationId: number, index: number): void {
         console.log("🔍 Navigating to message detail:", notificationId);
 
         // ✅ เรียก API เพื่ออัปเดตสถานะเป็น "อ่านแล้ว"
@@ -128,6 +128,6 @@ export class NotificationComponent implements OnInit {
             error: (err) => console.error("❌ Error marking as read:", err),
         });
 
-        this.router.navigate(['/post', userId]); // ✅ ไปยังหน้ารายละเอียดโพสต์
+        this.router.navigate(['/post', contentId]); // ✅ ไปยังหน้ารายละเอียดโพสต์
     }
 }

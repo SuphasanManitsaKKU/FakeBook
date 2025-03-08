@@ -154,7 +154,9 @@ export class UserDetailComponent implements OnInit {
     }
   }
 
-  goToHHome() {
+  goToHome() {
+    console.log('🚀 กำลังกลับหน้าหลัก...');
+    
     this.router.navigate(['/']);
   }
 }

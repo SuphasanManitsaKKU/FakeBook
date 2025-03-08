@@ -1,5 +1,6 @@
 import { UserPublicService } from './../../services/userPublic/userPublic.service';
 import { ShareService } from './../../services/auth/share/share.service';
+import { PostService } from './../../services/auth/post/post.service';  // ✅ Import PostService
 import { Component, OnInit } from '@angular/core';
 import { PostComponent } from '../post/post.component';
 import { PostResponseDTO } from '../../type';
@@ -13,30 +14,48 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './feed-user.component.css'
 })
 export class FeedUserComponent implements OnInit {
-  posts: PostResponseDTO[] = [];  // ✅ เก็บโพสต์ทั้งหมด
-  userId: number = 0; // ✅ ตัวอย่าง userId (เปลี่ยนเป็นค่า dynamic)
+  posts: PostResponseDTO[] = [];  
+  userId: number = 0;  
 
-  constructor(private shareService: ShareService, private userPublicService: UserPublicService) { }
+  constructor(
+    private shareService: ShareService, 
+    private userPublicService: UserPublicService,
+    private postService: PostService // ✅ เพิ่ม PostService
+  ) {}
 
   ngOnInit(): void {
     this.userId = this.userPublicService.getUserId();
     this.loadFeed();
   }
 
-  /** ✅ โหลดโพสต์ของเราและเพื่อน */
+  /** ✅ โหลดโพสต์ของตัวเอง + โพสต์ที่แชร์ */
   loadFeed(): void {
+    let sharedPosts: PostResponseDTO[] = [];
+    let userPosts: PostResponseDTO[] = [];
+
+    // 📌 ดึงโพสต์ที่แชร์
     this.shareService.getSharedPostsByUser(this.userId).subscribe((posts) => {
-      this.posts = posts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      sharedPosts = posts;
+      this.combineAndSortPosts(sharedPosts, userPosts);
+    });
+
+    // 📌 ดึงโพสต์ของตัวเอง
+    this.postService.getPostsByUser(this.userId).subscribe((posts) => {
+      userPosts = posts;
+      this.combineAndSortPosts(sharedPosts, userPosts);
     });
   }
 
-  /** ✅ อัปเดต Feed เมื่อมีโพสต์ใหม่ */
+  /** ✅ รวมโพสต์ + เรียงลำดับล่าสุดก่อน */
+  private combineAndSortPosts(shared: PostResponseDTO[], user: PostResponseDTO[]): void {
+    this.posts = [...shared, ...user].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }
+
   onPostCreated(): void {
-    this.loadFeed(); // โหลดโพสต์ใหม่ทั้งหมด
+    this.loadFeed(); 
   }
 
   onPostDeleted(postId: number): void {
     this.posts = this.posts.filter(post => post.id !== postId);
   }
-
 }

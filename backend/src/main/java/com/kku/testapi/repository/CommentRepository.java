@@ -14,7 +14,7 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     // ดึงความคิดเห็นทั้งหมดของโพสต์
     List<Comment> findByPostId(Integer postId);
 
-    // ดึงความคิดเห็นซ้อนจาก parentCommentId
+    // ✅ ค้นหาคอมเมนต์ที่มี parentComment เท่ากับ parentCommentId
     List<Comment> findByParentCommentId(Integer parentCommentId);
 
     // ลบความคิดเห็นทั้งหมดของโพสต์

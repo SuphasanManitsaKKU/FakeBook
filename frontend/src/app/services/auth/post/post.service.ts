@@ -38,4 +38,9 @@ export class PostService {
   getUserAndFriendsPosts(userId: number): Observable<PostResponseDTO[]> {
     return this.http.get<PostResponseDTO[]>(`${this.apiUrl}/posts/user-and-friends/${userId}`, { withCredentials: true });
   }
+
+  // ดึงโพสต์ทั้งหมดของผู้ใช้
+  getPostsByUser(userId: number): Observable<PostResponseDTO[]> {
+    return this.http.get<PostResponseDTO[]>(`${this.apiUrl}/posts/user/${userId}`, { withCredentials: true });
+  }
 }

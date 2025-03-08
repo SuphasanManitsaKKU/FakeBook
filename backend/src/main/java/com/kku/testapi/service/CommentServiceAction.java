@@ -72,7 +72,7 @@ public class CommentServiceAction {
         return comments;
     }
 
-    // ดึงความคิดเห็นซ้อน
+    // ✅ ดึงความคิดเห็นที่อยู่ใต้ parentComment 1 ระดับเท่านั้น
     public List<Comment> getNestedComments(Integer parentCommentId) {
         List<Comment> nestedComments = commentRepository.findByParentCommentId(parentCommentId);
 
@@ -82,25 +82,24 @@ public class CommentServiceAction {
             user.setImageProfile(userService.getUserWithBase64Images(user.getId()).getImageProfile());
         });
 
-        return nestedComments;
+        return nestedComments; // ✅ ส่งเฉพาะคอมเมนต์ที่อยู่ใต้ parentComment 1 ระดับ
     }
 
     // อัปเดตความคิดเห็น
     @Transactional
-    public Comment updateComment(Integer id, Comment updatedComment) {
-        Comment existingComment = commentRepository.findById(id)
+    public Comment updateComment(Integer commentId, CommentRequestDTO updatedComment) {
+        Comment existingComment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
-
+    
+        // ✅ ตรวจสอบว่า userId เป็นเจ้าของคอมเมนต์
+        if (!existingComment.getUser().getId().equals(updatedComment.getUserId())) {
+            throw new IllegalArgumentException("User is not authorized to edit this comment");
+        }
+    
+        // ✅ อัปเดตเนื้อหาคอมเมนต์
         existingComment.setMessage(updatedComment.getMessage());
-
-        // ✅ บันทึกการอัปเดต
-        Comment savedComment = commentRepository.save(existingComment);
-
-        // ✅ แปลงรูปภาพของ User เป็น Base64 ก่อนส่งออกไป
-        User user = savedComment.getUser();
-        user.setImageProfile(userService.getUserWithBase64Images(user.getId()).getImageProfile());
-
-        return savedComment;
+    
+        return commentRepository.save(existingComment);
     }
 
     // ลบความคิดเห็น

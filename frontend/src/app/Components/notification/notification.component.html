@@ -10,7 +10,7 @@
         *ngIf="isDropdownVisible">
         <div *ngFor="let message of messages; let i = index"
             class="px-4 py-2 border-b border-gray-200 last:border-none cursor-pointer hover:bg-gray-100"
-            (click)="navigateToMessageDetail(message.userId,message.notificationId, i)">
+            (click)="navigateToMessageDetail(message.contentId,message.notificationId, i)">
             <span *ngIf="message.status == 0">❌</span>
             <span *ngIf="message.status == 1">✅</span>
             {{ message.message }}

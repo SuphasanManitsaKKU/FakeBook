@@ -1,108 +1,113 @@
-<div class="comments mt-6">
-  <!-- วนแสดง Parent Comments -->
-  <ng-container *ngFor="let comment of parentComments">
-    <div class="comment mb-4 p-4 bg-gray-100 rounded-lg flex items-start w-full">
-      <img [src]="comment.user.imageProfile ? comment.user.imageProfile : 'default-profile.png'" alt="Profile Image"
-        class="w-10 h-10 rounded-full mr-3" />
+<div class="comments mt-6 space-y-6">
+  <!-- ✅ แสดง Parent Comments (ระดับ 1) -->
+  <ng-container *ngFor="let comment1 of parentComments">
+    <div class="flex items-start space-x-3 bg-white shadow-md p-4 rounded-xl">
+      <img [src]="comment1.user.imageProfile ? comment1.user.imageProfile : 'default-profile.png'" alt="Profile Image"
+        class="w-12 h-12 rounded-full object-cover" />
 
       <div class="w-full">
-        <p class="text-sm font-semibold">{{ comment.user.username }}</p>
-        <p class="text-gray-700 text-base">{{ comment.message }}</p>
+        <p class="text-sm font-semibold text-gray-900">{{ comment1.user.username }}</p>
+        <p *ngIf="editingCommentId !== comment1.id" class="text-gray-700 text-base mt-1">{{ comment1.message }}</p>
 
-        <!-- ปุ่มต่าง ๆ -->
-        <div class="flex gap-2 mt-2">
-          <!-- ✅ ปุ่มตอบกลับ (เฉพาะคอมเมนต์ที่ยังไม่เกิน 3 ชั้น) -->
-          <button *ngIf="getCommentDepth(comment) < 3" class="text-blue-500 hover:underline"
-            (click)="startReply(comment.id)">
-            ตอบกลับ
+        <div *ngIf="editingCommentId == comment1.id" class="mt-2">
+          <input type="text" [(ngModel)]="editedMessage" class="w-full p-2 border rounded-lg" />
+          <div class="mt-2 flex space-x-2">
+            <button class="bg-green-500 text-white py-1 px-3 rounded-md" (click)="saveEdit(comment1)">บันทึก</button>
+            <button class="text-gray-500" (click)="stopEdit()">ยกเลิก</button>
+          </div>
+        </div>
+
+        <div class="flex space-x-4 mt-2 text-xs text-gray-500">
+          <button *ngIf="getCommentDepth(comment1) < 3" class="hover:underline" (click)="startReply(comment1.id)">
+            Reply
           </button>
-
-          <!-- ✅ ปุ่มแก้ไข (เฉพาะเจ้าของ และต้องไม่เกิน 3 ชั้น) -->
-          <button *ngIf="comment.user.id == userId && getCommentDepth(comment) <= 3"
-            class="text-yellow-500 hover:underline" (click)="startEdit(comment)">
-            แก้ไข
+          <button *ngIf="comment1.user.id == userId && editingCommentId !== comment1.id"
+            class="text-yellow-500 hover:underline" (click)="startEdit(comment1)">
+            Edit
           </button>
-
-          <!-- ✅ ปุ่มลบ (เฉพาะเจ้าของ และต้องไม่เกิน 3 ชั้น) -->
-          <button *ngIf="comment.user.id == userId && getCommentDepth(comment) <= 3"
-            class="text-red-500 hover:underline" (click)="deleteComment(comment.id)">
-            ลบ
+          <button *ngIf="comment1.user.id == userId" class="text-red-500 hover:underline"
+            (click)="deleteComment(comment1.id)">
+            Delete
           </button>
         </div>
 
-        <!-- กล่อง input-comment สำหรับตอบกลับ -->
-        <div *ngIf="replyingToCommentId == comment.id" class="mt-2">
-          <app-input-comment [postId]="postId" [parentCommentId]="comment.id"
+        <div *ngIf="replyingToCommentId == comment1.id" class="mt-2">
+          <app-input-comment [postId]="postId" [parentCommentId]="comment1.id"
             (commentAdded)="onCommentAddedFromChild()"></app-input-comment>
           <button class="text-gray-500 mt-2" (click)="stopReply()">ยกเลิก</button>
         </div>
 
-        <!-- ✅ วนลูปแสดงคอมเมนต์ลูกแบบจำกัดแค่ 3 ชั้น -->
-        <div class="nested-comments mt-4 ml-4 border-l border-gray-300 pl-3 w-[97.5%]">
-          <ng-container *ngIf="getCommentDepth(comment) < 3">
-            <ng-container *ngFor="let reply of repliesMap[comment.id]">
-              <div class="reply mb-2 p-3 bg-gray-200 rounded-lg flex items-start w-full">
-                <img [src]="reply.user.imageProfile ? reply.user.imageProfile : 'default-profile.png'"
-                  alt="Profile Image" class="w-8 h-8 rounded-full mr-3" />
-                <div class="w-full">
-                  <p class="text-sm font-semibold">{{ reply.user.username }}</p>
-                  <p class="text-gray-700 text-sm">{{ reply.message }}</p>
-                  <div class="flex gap-2 mt-1">
-                    <button *ngIf="getCommentDepth(reply) < 3" class="text-blue-500 hover:underline"
-                      (click)="startReply(reply.id)">
-                      ตอบกลับ
-                    </button>
+        <!-- ✅ แสดง Replies (ระดับ 2) -->
+        <div *ngIf="repliesMap[comment1.id]" class="mt-6 flex flex-col gap-6 pl-10 border-l-4 border-gray-300">
+          <ng-container *ngFor="let comment2 of repliesMap[comment1.id]">
+            <div class="flex items-start space-x-3 bg-gray-100 p-4 rounded-xl shadow-md">
+              <img [src]="comment2.user.imageProfile ? comment2.user.imageProfile : 'default-profile.png'"
+                alt="Profile Image" class="w-10 h-10 rounded-full object-cover" />
 
-                    <!-- ✅ ปุ่มแก้ไข (เฉพาะเจ้าของ และต้องไม่เกิน 3 ชั้น) -->
-                    <button *ngIf="reply.user.id == userId && getCommentDepth(reply) <= 3"
-                      class="text-yellow-500 hover:underline" (click)="startEdit(reply)">
-                      แก้ไข
-                    </button>
+              <div class="w-full">
+                <p class="text-sm font-semibold text-gray-900">{{ comment2.user.username }}</p>
+                <p *ngIf="editingCommentId !== comment2.id" class="text-gray-700 text-sm">{{ comment2.message }}</p>
 
-                    <!-- ✅ ปุ่มลบ (เฉพาะเจ้าของ และต้องไม่เกิน 3 ชั้น) -->
-                    <button *ngIf="reply.user.id == userId && getCommentDepth(reply) <= 3"
-                      class="text-red-500 hover:underline" (click)="deleteComment(reply.id)">
-                      ลบ
-                    </button>
+                <div *ngIf="editingCommentId == comment2.id">
+                  <input type="text" [(ngModel)]="editedMessage" class="w-full p-2 border rounded-lg" />
+                  <div class="mt-2 flex space-x-2">
+                    <button class="bg-green-500 text-white py-1 px-3 rounded-md"
+                      (click)="saveEdit(comment2)">บันทึก</button>
+                    <button class="text-gray-500" (click)="stopEdit()">ยกเลิก</button>
                   </div>
                 </div>
+
+                <div class="flex space-x-4 mt-2 text-xs text-gray-500">
+                  <button *ngIf="getCommentDepth(comment2) < 3" class="hover:underline"
+                    (click)="startReply(comment2.id)">
+                    Reply
+                  </button>
+                  <button *ngIf="comment2.user.id == userId && editingCommentId !== comment2.id"
+                    class="text-yellow-500 hover:underline" (click)="startEdit(comment2)">
+                    Edit
+                  </button>
+                  <button *ngIf="comment2.user.id == userId" class="text-red-500 hover:underline"
+                    (click)="deleteComment(comment2.id)">
+                    Delete
+                  </button>
+                </div>
               </div>
+            </div>
 
-              <!-- ✅ วนลูปแสดงคอมเมนต์ระดับที่ 3 -->
-              <div class="nested-comments mt-4 ml-4 border-l border-gray-300 pl-3 w-[95%]">
-                <ng-container *ngIf="getCommentDepth(reply) < 3">
-                  <ng-container *ngFor="let subReply of repliesMap[reply.id]">
-                    <div class="reply mb-2 p-3 bg-gray-300 rounded-lg flex items-start w-full">
-                      <img [src]="subReply.user.imageProfile ? subReply.user.imageProfile : 'default-profile.png'"
-                        alt="Profile Image" class="w-6 h-6 rounded-full mr-3" />
-                      <div class="w-full">
-                        <p class="text-sm font-semibold">{{ subReply.user.username }}</p>
-                        <p class="text-gray-700 text-sm">{{ subReply.message }}</p>
-                        <div class="flex gap-2 mt-1">
-                          <!-- ✅ ชั้นที่ 3 ไม่มีปุ่มตอบกลับ -->
-                          <button *ngIf="getCommentDepth(subReply) < 3" class="text-blue-500 hover:underline"
-                            (click)="startReply(subReply.id)">
-                            ตอบกลับ
-                          </button>
+            <!-- ✅ แสดง Replies (ระดับ 3) -->
+            <div *ngIf="repliesMap[comment2.id]" class="flex flex-col gap-6 pl-10 border-l-4 border-gray-300">
+              <ng-container *ngFor="let comment3 of repliesMap[comment2.id]">
+                <div class="flex items-start space-x-3 bg-gray-200 p-4 rounded-xl shadow-md">
+                  <img [src]="comment3.user.imageProfile ? comment3.user.imageProfile : 'default-profile.png'"
+                    alt="Profile Image" class="w-8 h-8 rounded-full object-cover" />
 
-                          <!-- ✅ ปุ่มแก้ไข (เฉพาะเจ้าของ และต้องไม่เกิน 3 ชั้น) -->
-                          <button *ngIf="subReply.user.id == userId" class="text-yellow-500 hover:underline"
-                            (click)="startEdit(subReply)">
-                            แก้ไข
-                          </button>
+                  <div class="w-full">
+                    <p class="text-sm font-semibold text-gray-900">{{ comment3.user.username }}</p>
+                    <p *ngIf="editingCommentId !== comment3.id" class="text-gray-700 text-sm">{{ comment3.message }}</p>
 
-                          <!-- ✅ ปุ่มลบ (เฉพาะเจ้าของ และต้องไม่เกิน 3 ชั้น) -->
-                          <button *ngIf="subReply.user.id == userId" class="text-red-500 hover:underline"
-                            (click)="deleteComment(subReply.id)">
-                            ลบ
-                          </button>
-                        </div>
+                    <div *ngIf="editingCommentId == comment3.id">
+                      <input type="text" [(ngModel)]="editedMessage" class="w-full p-2 border rounded-lg" />
+                      <div class="mt-2 flex space-x-2">
+                        <button class="bg-green-500 text-white py-1 px-3 rounded-md"
+                          (click)="saveEdit(comment3)">บันทึก</button>
+                        <button class="text-gray-500" (click)="stopEdit()">ยกเลิก</button>
                       </div>
                     </div>
-                  </ng-container>
-                </ng-container>
-              </div>
-            </ng-container>
+
+                    <div class="flex space-x-4 mt-2 text-xs text-gray-500">
+                      <button *ngIf="comment3.user.id == userId && editingCommentId !== comment3.id"
+                        class="text-yellow-500 hover:underline" (click)="startEdit(comment3)">
+                        Edit
+                      </button>
+                      <button *ngIf="comment3.user.id == userId" class="text-red-500 hover:underline"
+                        (click)="deleteComment(comment3.id)">
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
           </ng-container>
         </div>
       </div>
@@ -111,8 +116,7 @@
 
   <!-- 🔹 InputComment สำหรับคอมเมนต์ใหม่ (ไม่ตอบใคร) -->
   <div class="mt-6">
-    <app-input-comment [postId]="postId" [parentCommentId]="null"
-      (commentAdded)="loadComments(); onCommentAddedFromChild()">
+    <app-input-comment [postId]="postId" [parentCommentId]="null" (commentAdded)="loadComments();">
     </app-input-comment>
   </div>
 </div>

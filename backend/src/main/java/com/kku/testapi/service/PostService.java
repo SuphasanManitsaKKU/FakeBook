@@ -117,4 +117,11 @@ public class PostService {
         System.out.println("----------------------------------------------------------------------------7");
         return postResponseDTO;
     }
+
+    public List<PostResponseDTO> getPostsByUser(Integer userId) {
+        List<Post> posts = postRepository.findByUserId(userId);
+        return posts.stream()
+                .map(this::convertToPostResponseDTO) // แปลงเป็น DTO
+                .collect(Collectors.toList());
+    }
 }

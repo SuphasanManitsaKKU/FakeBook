@@ -36,7 +36,7 @@ public class CommentController {
 
     // ✅ อัปเดตความคิดเห็น
     @PutMapping("/{id}")
-    public Comment updateComment(@PathVariable Integer id, @RequestBody Comment updatedComment) {
+    public Comment updateComment(@PathVariable Integer id, @RequestBody CommentRequestDTO updatedComment) {
         return commentService.updateComment(id, updatedComment);
     }
 

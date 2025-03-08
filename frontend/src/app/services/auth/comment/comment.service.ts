@@ -26,7 +26,12 @@ export class CommentService {
   }
 
   updateComment(id: number, updatedComment: Comment): Observable<Comment> {
-    return this.http.put<Comment>(`${this.apiUrl}/comments/${id}`, updatedComment, { withCredentials: true });
+    return this.http.put<Comment>(`${this.apiUrl}/comments/${id}`,
+      {
+        message: updatedComment.message,
+        userId: updatedComment.user.id,
+      },
+      { withCredentials: true });
   }
 
   deleteComment(id: number): Observable<void> {
