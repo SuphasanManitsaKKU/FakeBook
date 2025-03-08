@@ -12,8 +12,8 @@
         <div *ngIf="editingCommentId == comment1.id" class="mt-2">
           <input type="text" [(ngModel)]="editedMessage" class="w-full p-2 border rounded-lg" />
           <div class="mt-2 flex space-x-2">
-            <button class="bg-green-500 text-white py-1 px-3 rounded-md" (click)="saveEdit(comment1)">บันทึก</button>
-            <button class="text-gray-500" (click)="stopEdit()">ยกเลิก</button>
+            <button class="bg-green-500 text-white py-1 px-3 rounded-md" (click)="saveEdit(comment1)">Save</button>
+            <button class="text-gray-500" (click)="stopEdit()">Cancel</button>
           </div>
         </div>
 
@@ -34,7 +34,7 @@
         <div *ngIf="replyingToCommentId == comment1.id" class="mt-2">
           <app-input-comment [postId]="postId" [parentCommentId]="comment1.id"
             (commentAdded)="onCommentAddedFromChild()"></app-input-comment>
-          <button class="text-gray-500 mt-2" (click)="stopReply()">ยกเลิก</button>
+          <button class="text-gray-500 mt-2" (click)="stopReply()">Cancel</button>
         </div>
 
         <!-- ✅ แสดง Replies (ระดับ 2) -->
@@ -52,8 +52,8 @@
                   <input type="text" [(ngModel)]="editedMessage" class="w-full p-2 border rounded-lg" />
                   <div class="mt-2 flex space-x-2">
                     <button class="bg-green-500 text-white py-1 px-3 rounded-md"
-                      (click)="saveEdit(comment2)">บันทึก</button>
-                    <button class="text-gray-500" (click)="stopEdit()">ยกเลิก</button>
+                      (click)="saveEdit(comment2)">Save</button>
+                    <button class="text-gray-500" (click)="stopEdit()">Cancel</button>
                   </div>
                 </div>
 
@@ -89,8 +89,8 @@
                       <input type="text" [(ngModel)]="editedMessage" class="w-full p-2 border rounded-lg" />
                       <div class="mt-2 flex space-x-2">
                         <button class="bg-green-500 text-white py-1 px-3 rounded-md"
-                          (click)="saveEdit(comment3)">บันทึก</button>
-                        <button class="text-gray-500" (click)="stopEdit()">ยกเลิก</button>
+                          (click)="saveEdit(comment3)">Save</button>
+                        <button class="text-gray-500" (click)="stopEdit()">Cancel</button>
                       </div>
                     </div>
 

@@ -118,18 +118,18 @@ export class CommentComponent implements OnInit {
   /** ✅ ลบคอมเมนต์ */
   deleteComment(commentId: number): void {
     Swal.fire({
-      title: 'ยืนยันการลบคอมเมนต์?',
-      text: 'คุณต้องการลบคอมเมนต์นี้หรือไม่?',
+      title: 'Confirm Comment Deletion?',
+      text: 'Are you sure you want to delete this comment?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'ลบเลย!',
-      cancelButtonText: 'ยกเลิก',
+      confirmButtonText: 'Delete!',
+      cancelButtonText: 'Cancel',
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6'
     }).then((result) => {
       if (result.isConfirmed) {
         this.commentService.deleteComment(commentId).subscribe(() => {
-          Swal.fire('ลบสำเร็จ!', 'คอมเมนต์ของคุณถูกลบแล้ว', 'success');
+          Swal.fire('Deleted!', 'Your comment has been deleted.', 'success');
           this.loadComments();
         });
       }

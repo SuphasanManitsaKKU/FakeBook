@@ -136,7 +136,7 @@ export class UserDetailComponent implements OnInit {
       setTimeout(() => this.loadUserProfile(), 1000);
 
       Swal.fire({
-        title: 'บันทึกข้อมูลสำเร็จ!',
+        title: 'Data Saved Successfully!',
         icon: 'success',
         timer: 1500,
         showConfirmButton: false
@@ -147,8 +147,8 @@ export class UserDetailComponent implements OnInit {
     } catch (err) {
       console.error('❌ บันทึกข้อมูลล้มเหลว:', err);
       Swal.fire({
-        title: 'เกิดข้อผิดพลาด',
-        text: 'ไม่สามารถบันทึกโปรไฟล์ได้',
+        title: 'Error Occurred',
+        text: 'Unable to save profile',
         icon: 'error',
       });
     }
@@ -156,7 +156,7 @@ export class UserDetailComponent implements OnInit {
 
   goToHome() {
     console.log('🚀 กำลังกลับหน้าหลัก...');
-    
+
     this.router.navigate(['/']);
   }
 }

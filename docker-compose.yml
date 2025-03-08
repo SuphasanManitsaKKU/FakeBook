@@ -10,6 +10,7 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
     depends_on:
       - mysql
+    restart: always  # ✅ ให้ Restart ถ้ามีปัญหาแทน Healthcheck
 
   frontend:
     build:
@@ -31,8 +32,11 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - '3306:3306'
-    volumes:
-      - /mysql_data:/var/lib/mysql
+    healthcheck:
+      # ✅ ทำให้ MySQL แจ้งว่าพร้อมใช้งานก่อน Spring Boot รัน
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      retries: 5
 
   nginx:
     image: nginx:latest
@@ -42,8 +46,14 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - mysql
+      frontend:
+        condition: service_started
+      mysql:
+        condition: service_healthy
 
+networks:
+  default:
+    driver: bridge
 
 # docker-compose --env-file .env up --build -d
 

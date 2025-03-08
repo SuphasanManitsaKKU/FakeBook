@@ -24,7 +24,7 @@ export class InputPostComponent implements OnInit {
   constructor(
     private postService: PostService,
     private userPublicService: UserPublicService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.userId = this.userPublicService.getUserId();
@@ -51,8 +51,8 @@ export class InputPostComponent implements OnInit {
 
       Swal.fire({
         icon: 'success',
-        title: 'โพสต์สำเร็จ!',
-        text: 'โพสต์ของคุณถูกสร้างแล้ว',
+        title: 'Post Successful!',
+        text: 'Your post has been created.',
         timer: 1500,
         showConfirmButton: false
       });
@@ -62,8 +62,8 @@ export class InputPostComponent implements OnInit {
     } catch (error) {
       Swal.fire({
         icon: 'error',
-        title: 'เกิดข้อผิดพลาด!',
-        text: 'ไม่สามารถโพสต์ได้ โปรดลองใหม่อีกครั้ง'
+        title: 'An error occurred!',
+        text: 'Unable to post. Please try again.'
       });
       console.error('❌ Error posting:', error);
     } finally {

@@ -6,24 +6,24 @@ import { UserService } from '../../services/auth/user/user.service';
 
 @Component({
     selector: 'app-login',
-    imports: [CommonModule, FormsModule], // สำหรับ Standalone Component
+    imports: [CommonModule, FormsModule], 
     templateUrl: './login.component.html',
-    styleUrls: ['./login.component.css'], // แก้ไขจาก styleUrl เป็น styleUrls
+    styleUrls: ['./login.component.css'],
 })
 
 export class LoginComponent {
 
-    username: string = '';
+    email: string = '';
     password: string = '';
     errorMessage: string = '';
 
     constructor(
-        private userService: UserService, // Inject AuthService
+        private userService: UserService, 
         private router: Router
     ) { }
 
     login(): void {
-        this.userService.login(this.username, this.password).subscribe(
+        this.userService.login(this.email, this.password).subscribe(
             (response) => {
                 console.log('Login successful:', response);
 
@@ -31,12 +31,12 @@ export class LoginComponent {
             },
             (error) => {
                 console.error('Login failed:', error);
-                this.errorMessage = 'Login failed. Please check your username and password.';
+                this.errorMessage = 'Login failed. Please check your email and password.';
             }
         );
     }
 
     goToRegister(): void {
-        this.router.navigate(['/register']); // เปลี่ยนไปยังหน้า Register
+        this.router.navigate(['/register']); 
     }
 }

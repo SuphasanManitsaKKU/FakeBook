@@ -13,8 +13,8 @@ export class UserService {
     constructor(private http: HttpClient) { }
 
     // ✅ ฟังก์ชันสำหรับการ Login
-    login(username: string, password: string): Observable<any> {
-        const body = { username, password };
+    login(email: string, password: string): Observable<any> {
+        const body = { email, password };
         return this.http.post(`${this.apiUrl}/users/login`, body, { withCredentials: true });
     }
 

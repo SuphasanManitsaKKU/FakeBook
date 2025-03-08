@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2'; 
+import Swal from 'sweetalert2';
 
 import { PostService } from '../../services/auth/post/post.service';
 import { LikeService } from '../../services/auth/like/like.service';
 import { ShareService } from '../../services/auth/share/share.service';
 import { UserPublicService } from '../../services/userPublic/userPublic.service';
 
-import { PostDTO, PostResponseDTO } from '../../type'; 
+import { PostDTO, PostResponseDTO } from '../../type';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommentComponent } from '../comment/comment.component';
@@ -31,7 +31,7 @@ export class PostComponent implements OnInit {
   showComments: boolean = false;
   showShareOptions: boolean = false;
   showPostMenu: boolean = false;
-  
+
   editing: boolean = false;
   editedContent: string = '';
 
@@ -42,8 +42,8 @@ export class PostComponent implements OnInit {
     private likeService: LikeService,
     private shareService: ShareService,
     private userPublicService: UserPublicService,
-    private router: Router, 
-  ) {}
+    private router: Router,
+  ) { }
 
   ngOnInit(): void {
     this.userId = this.userPublicService.getUserId();
@@ -93,18 +93,18 @@ export class PostComponent implements OnInit {
         this.editing = false;
 
         Swal.fire({
-          title: 'บันทึกสำเร็จ!',
-          text: 'โพสต์ของคุณถูกอัปเดตแล้ว',
+          title: 'Update Successful!',
+          text: 'Your post has been updated.',
           icon: 'success',
-          confirmButtonText: 'ตกลง'
+          confirmButtonText: 'OK'
         });
       },
       error: () => {
         Swal.fire({
-          title: 'เกิดข้อผิดพลาด',
-          text: 'ไม่สามารถอัปเดตโพสต์ได้ กรุณาลองใหม่อีกครั้ง',
+          title: 'Error Occurred',
+          text: 'Unable to update the post. Please try again.',
           icon: 'error',
-          confirmButtonText: 'ตกลง'
+          confirmButtonText: 'OK'
         });
       }
     });
@@ -114,18 +114,18 @@ export class PostComponent implements OnInit {
     if (!this.post) return;
 
     Swal.fire({
-      title: 'ยืนยันการลบโพสต์?',
-      text: 'คุณต้องการลบโพสต์นี้หรือไม่?',
+      title: 'Confirm Post Deletion?',
+      text: 'Are you sure you want to delete this post?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'ลบเลย!',
-      cancelButtonText: 'ยกเลิก',
+      confirmButtonText: 'Delete!',
+      cancelButtonText: 'Cancel',
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6'
     }).then((result) => {
       if (result.isConfirmed) {
         this.postService.deletePost(this.post!.id).subscribe(() => {
-          Swal.fire('ลบสำเร็จ!', 'โพสต์ของคุณถูกลบแล้ว', 'success');
+          Swal.fire('Deleted!', 'Your post has been successfully deleted.', 'success');
           this.postDeleted.emit(this.postId); // แจ้งไป Component แม่ (ถ้ามี)
         });
       }
@@ -151,17 +151,17 @@ export class PostComponent implements OnInit {
     if (!this.post) return;
     const postUrl = `${this.apiUrl}/post/${this.post.id}`;
     navigator.clipboard.writeText(postUrl).then(() => {
-      Swal.fire('คัดลอกลิงก์แล้ว!', 'คุณสามารถแชร์ลิงก์นี้ให้เพื่อนได้เลย', 'success');
+      Swal.fire('Link Copied!', 'You can now share this link with your friends.', 'success');
       this.showShareOptions = false;
     }).catch(() => {
-      Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถคัดลอกลิงก์ได้', 'error');
+      Swal.fire('Error', 'Failed to copy the link. Please try again.', 'error');
     });
   }
 
   shareToFeed(): void {
     if (!this.post) return;
     this.shareService.sharePost(this.userId, this.post.id).subscribe(() => {
-      Swal.fire('แชร์สำเร็จ!', 'โพสต์ของคุณถูกแชร์ไปยัง Feed แล้ว', 'success');
+      Swal.fire('Shared Successfully!', 'Your post has been shared to the Feed.', 'success');
       this.showShareOptions = false;
       this.loadPost();
     });

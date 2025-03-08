@@ -41,15 +41,16 @@ public class UserServiceAction implements UserService {
     }
 
     @Override
-    public User login(String username, String password) {
-        User user = userRepository.findByUsername(username);
+    public User login(String email, String password) {
+        System.out.println("++++++++++++++++++++++++++++++++++++++2");
+        User user = userRepository.findByEmail(email);
         if (user != null) {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             if (passwordEncoder.matches(password, user.getPassword())) {
                 return user;
             }
         }
-        throw new RuntimeException("Invalid username or password");
+        throw new RuntimeException("Invalid email or password");
     }
 
     @Override

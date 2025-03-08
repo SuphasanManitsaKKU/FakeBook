@@ -48,7 +48,9 @@ public class UserController {
     // ✅ Login และสร้าง JWT
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody User user) {
-        User userLogin = this.userService.login(user.getUsername(), user.getPassword());
+        System.out.println("user.getEmail() = " + user.getEmail());
+        System.out.println("++++++++++++++++++++++++++++++++++++++1");
+        User userLogin = this.userService.login(user.getEmail(), user.getPassword());
 
         // สร้าง JWT Token
         String token = JwtUtil.generateToken(String.valueOf(userLogin.getId()), userLogin.getUsername());
