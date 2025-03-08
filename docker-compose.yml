@@ -1,25 +1,25 @@
 services:
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: backend_container
-  #   ports:
-  #     - "8080:8080"
-  #   environment:
-  #     - SPRING_PROFILES_ACTIVE=prod
-  #   depends_on:
-  #     - mysql
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_container
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - mysql
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   container_name: frontend_container
-  #   ports:
-  #     - "4200:4200"
-  #   depends_on:
-  #     - backend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_container
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
 
   mysql:
     image: mysql:8.0
@@ -32,7 +32,7 @@ services:
     ports:
       - '3306:3306'
     volumes:
-      - ./mysql_data:/var/lib/mysql
+      - /mysql_data:/var/lib/mysql
 
   nginx:
     image: nginx:latest
