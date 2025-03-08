@@ -33,11 +33,11 @@ Fakebook ช่วยให้ผู้ใช้สามารถ:
 
 ### Prerequisites
 ก่อนติดตั้ง ตรวจสอบว่าคุณมี:
-- [Node.js](https://nodejs.org/en) (แนะนำเวอร์ชันล่าสุด)
+- [Node.js](https://nodejs.org/en)
 - [Angular CLI](https://angular.io/cli)
 - [Java 17+](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html)
 - [MySQL](https://www.mysql.com/)
-- [Docker](https://www.docker.com/) (ถ้าใช้ container)
+- [Docker](https://www.docker.com/)
 
 ## 🛠 How To Run  
 
