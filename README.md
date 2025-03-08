@@ -44,6 +44,7 @@ Fakebook ช่วยให้ผู้ใช้สามารถ:
 ```bash
 git clone https://github.com/SuphasanManitsaKKU/FakeBook.git
 cd Fakebook
+cp .env.example .env
 docker compose up -d --build
 ```
 

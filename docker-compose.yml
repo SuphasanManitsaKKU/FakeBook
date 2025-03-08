@@ -8,8 +8,12 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - HOST_URL=${HOST_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - BACKEND_URL=${BACKEND_URL}
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     restart: always  # ✅ ให้ Restart ถ้ามีปัญหาแทน Healthcheck
 
   frontend:
@@ -26,14 +30,13 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: mydb
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - '3306:3306'
+      - "${MYSQL_PORT}:3306"
     healthcheck:
-      # ✅ ทำให้ MySQL แจ้งว่าพร้อมใช้งานก่อน Spring Boot รัน
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       retries: 5
@@ -54,11 +57,3 @@ services:
 networks:
   default:
     driver: bridge
-
-# docker-compose --env-file .env up --build -d
-
-
-# cd /Users/suphasan/Desktop/now
-# docker-compose up -d
-# cd backend
-# ./mvnw spring-boot:run

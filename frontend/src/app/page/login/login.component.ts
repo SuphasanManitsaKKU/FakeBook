@@ -3,22 +3,27 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/auth/user/user.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-login',
-    imports: [CommonModule, FormsModule], 
+    imports: [CommonModule, FormsModule, FontAwesomeModule],
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
 })
 
 export class LoginComponent {
 
+    faEnvelope = faEnvelope; // ไอคอน Email
+    faLock = faLock; // ไอคอน Password
+
     email: string = '';
     password: string = '';
     errorMessage: string = '';
 
     constructor(
-        private userService: UserService, 
+        private userService: UserService,
         private router: Router
     ) { }
 
@@ -37,6 +42,6 @@ export class LoginComponent {
     }
 
     goToRegister(): void {
-        this.router.navigate(['/register']); 
+        this.router.navigate(['/register']);
     }
 }

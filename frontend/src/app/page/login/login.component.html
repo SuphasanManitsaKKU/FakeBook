@@ -8,8 +8,8 @@
             <div class="relative">
                 <label for="email" class="block text-sm font-medium text-gray-600">Email</label>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
-                        <i class="fas fa-envelope"></i>
+                    <span class="absolute top-[30%] left-3 flex items-center text-gray-400">
+                        <fa-icon [icon]="faEnvelope"></fa-icon> <!-- ไอคอน Email -->
                     </span>
                     <input type="email" id="email" [(ngModel)]="email" name="email"
                         placeholder="e.g., johndoe@example.com"
@@ -22,8 +22,8 @@
             <div class="relative">
                 <label for="password" class="block text-sm font-medium text-gray-600">Password</label>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
-                        <i class="fas fa-lock"></i>
+                    <span class="absolute top-3 left-3 flex items-center text-gray-400">
+                        <fa-icon [icon]="faLock"></fa-icon> <!-- ไอคอน Password -->
                     </span>
                     <input type="password" id="password" [(ngModel)]="password" name="password"
                         placeholder="At least 8 characters"
