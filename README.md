@@ -39,9 +39,12 @@ Fakebook ช่วยให้ผู้ใช้สามารถ:
 - [MySQL](https://www.mysql.com/)
 - [Docker](https://www.docker.com/) (ถ้าใช้ container)
 
-### How To Run 
+## 🛠 How To Run  
 
-   ```bash
-   git clone https://github.com/SuphasanManitsaKKU/FakeBook.git
-   cd Fakebook
-   docker compose up -d --build
+```bash
+git clone https://github.com/SuphasanManitsaKKU/FakeBook.git
+cd Fakebook
+docker compose up -d --build
+```
+
+🔗 **สามารถเข้าใช้งานได้ที่**: [http://localhost](http://localhost)
