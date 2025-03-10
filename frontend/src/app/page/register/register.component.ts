@@ -3,14 +3,20 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/auth/user/user.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faUser, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-register',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+  faUser = faUser;
+  faEnvelope = faEnvelope;
+  faLock = faLock;
+
   username: string = '';
   email: string = '';
   password: string = '';

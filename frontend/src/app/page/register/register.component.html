@@ -1,34 +1,47 @@
 <div class="flex items-center justify-center min-h-screen bg-gray-100 px-4">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 class="text-2xl font-bold mb-4 text-center text-gray-700">Create an Account</h2>
-        <p class="text-sm text-center text-gray-500 mb-6">
-            Join us and get started today.
-        </p>
+        <p class="text-sm text-center text-gray-500 mb-6">Join us and get started today.</p>
+
         <form (submit)="register(); $event.preventDefault()" class="space-y-6">
             <!-- Username -->
             <div class="relative">
                 <label class="block text-sm font-medium text-gray-600">Username</label>
-                <input type="text" [(ngModel)]="username" name="username" placeholder="e.g., johndoe123"
-                    class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-blue-500"
-                    required />
+                <div class="relative">
+                    <span class="absolute top-3 left-3 flex items-center text-gray-400">
+                        <fa-icon [icon]="faUser"></fa-icon>
+                    </span>
+                    <input type="text" [(ngModel)]="username" name="username" placeholder="e.g., johndoe123"
+                        class="w-full px-10 py-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-blue-500"
+                        required />
+                </div>
             </div>
 
             <!-- Email -->
             <div class="relative">
                 <label class="block text-sm font-medium text-gray-600">Email</label>
-                <input type="email" [(ngModel)]="email" name="email" placeholder="e.g., johndoe@example.com"
-                    class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-blue-500"
-                    required />
-                <p *ngIf="emailError" class="text-red-500 text-sm mt-1">{{ emailError }}</p>
+                <div class="relative">
+                    <span class="absolute top-[30%] left-3 flex items-center text-gray-400">
+                        <fa-icon [icon]="faEnvelope"></fa-icon>
+                    </span>
+                    <input type="email" [(ngModel)]="email" name="email" placeholder="e.g., johndoe@example.com"
+                        class="w-full px-10 py-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-blue-500"
+                        required />
+                    <p *ngIf="emailError" class="text-red-500 text-sm mt-1">{{ emailError }}</p>
+                </div>
             </div>
 
             <!-- Password -->
             <div class="relative">
                 <label class="block text-sm font-medium text-gray-600">Password</label>
-                <input type="password" [(ngModel)]="password" name="password"
-                    class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-blue-500"
-                    required />
-
+                <div class="relative">
+                    <span class="absolute top-3 left-3 flex items-center text-gray-400">
+                        <fa-icon [icon]="faLock"></fa-icon>
+                    </span>
+                    <input type="password" [(ngModel)]="password" name="password"
+                        class="w-full px-10 py-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-blue-500"
+                        required />
+                </div>
                 <!-- ✅ Password Strength Checker -->
                 <ul class="mt-2 text-sm">
                     <li [class.text-green-500]="passwordValidLength" [class.text-red-500]="!passwordValidLength">
@@ -57,15 +70,16 @@
             <!-- Confirm Password -->
             <div class="relative">
                 <label class="block text-sm font-medium text-gray-600">Confirm Password</label>
-                <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword"
-                    class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-blue-500"
-                    required />
-                <p *ngIf="!passwordsMatch && confirmPassword" class="text-red-500 text-sm mt-1">
-                    ❌ Passwords do not match
-                </p>
-                <p *ngIf="passwordsMatch && confirmPassword" class="text-green-500 text-sm mt-1">
-                    ✅ Passwords match
-                </p>
+                <div class="relative">
+                    <span class="absolute top-3 left-3 flex items-center text-gray-400">
+                        <fa-icon [icon]="faLock"></fa-icon>
+                    </span>
+                    <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword"
+                        class="w-full px-10 py-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-blue-500"
+                        required />
+                </div>
+                <p *ngIf="!passwordsMatch && confirmPassword" class="text-red-500 text-sm mt-1">❌ Passwords do not match</p>
+                <p *ngIf="passwordsMatch && confirmPassword" class="text-green-500 text-sm mt-1">✅ Passwords match</p>
             </div>
 
             <!-- Submit Button -->
