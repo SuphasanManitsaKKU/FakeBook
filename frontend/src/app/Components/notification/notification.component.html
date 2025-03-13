@@ -13,6 +13,8 @@
             (click)="navigateToMessageDetail(message.contentId,message.notificationId, i)">
             <span *ngIf="message.status == 0">❌</span>
             <span *ngIf="message.status == 1">✅</span>
+            {{ message.contentId }} -
+            {{ message.notificationId }} -
             {{ message.message }}
 
         </div>

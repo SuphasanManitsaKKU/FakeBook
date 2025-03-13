@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -17,7 +17,7 @@ import { UserPublicService } from '../../services/userPublic/userPublic.service'
 })
 export class CommentComponent implements OnInit {
   @Input() postId: number = 0;
-  @Input() parentCommentId: number | null = null; // ✅ รองรับการแสดงคอมเมนต์ซ้อน
+  @Input() parentCommentId: number | null = null;
 
   @Output() commentAdded = new EventEmitter<void>();
   @Output() commentDeleted = new EventEmitter<void>();
@@ -33,21 +33,25 @@ export class CommentComponent implements OnInit {
 
   constructor(
     private commentService: CommentService,
-    private userPublicService: UserPublicService
-  ) { }
+    private userPublicService: UserPublicService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    console.log('postId in PostComponent:', this.postId);
+    console.log('postId in CommentComponent:', this.postId);
 
     this.userId = this.userPublicService.getUserId();
     this.loadComments();
   }
 
-  /** ✅ โหลดคอมเมนต์และจัดเก็บโครงสร้างคอมเมนต์ Nested */
+  /** ✅ โหลดคอมเมนต์และจัดโครงสร้าง Nested */
   loadComments(): void {
     this.commentService.getCommentsByPost(this.postId).subscribe((comments) => {
-      this.comments = comments;
-      this.organizeComments(); // ✅ แยก Parent และ Replies
+      this.comments = [...comments]; 
+      this.organizeComments();
+      this.cdr.detectChanges();
+      
+      console.log("📌 โหลดคอมเมนต์ใหม่ สำเร็จ:", this.comments);
     });
   }
 
@@ -57,28 +61,35 @@ export class CommentComponent implements OnInit {
     this.repliesMap = {};
 
     this.comments.forEach((comment) => {
-      if (comment.parentComment) {
+      if (comment.parentComment && comment.parentComment.id) {
         if (!this.repliesMap[comment.parentComment.id]) {
           this.repliesMap[comment.parentComment.id] = [];
         }
         this.repliesMap[comment.parentComment.id].push(comment);
       }
     });
+
+    console.log("📌 Replies Map อัปเดตแล้ว:", this.repliesMap);
   }
 
   /** ✅ เช็คระดับความลึกของคอมเมนต์ (Max 3 ชั้น) */
   getCommentDepth(comment: Comment): number {
     let depth = 1;
-    while (comment.parentComment) {
+    let currentComment = comment;
+
+    while (currentComment.parentComment && currentComment.parentComment.id) {
       depth++;
-      comment = comment.parentComment;
+      currentComment = currentComment.parentComment;
+      if (depth > 3) break;  
     }
     return depth;
   }
 
-  /** ✅ เริ่มตอบกลับ */
+  /** ✅ เริ่มตอบกลับ (รองรับได้ทุกระดับ) */
   startReply(commentId: number): void {
+    console.log("📌 กำลังตอบกลับคอมเมนต์ ID:", commentId);
     this.replyingToCommentId = commentId;
+    this.cdr.detectChanges();
   }
 
   /** ✅ ยกเลิกตอบกลับ */
@@ -89,7 +100,7 @@ export class CommentComponent implements OnInit {
   /** ✅ เริ่มแก้ไข */
   startEdit(comment: Comment): void {
     this.editingCommentId = comment.id;
-    this.editedMessage = comment.message; // โหลดค่าปัจจุบันมาแสดง
+    this.editedMessage = comment.message;
   }
 
   /** ✅ ยกเลิกแก้ไข */
@@ -105,7 +116,7 @@ export class CommentComponent implements OnInit {
 
       this.commentService.updateComment(comment.id, updatedComment).subscribe(
         () => {
-          this.loadComments(); // โหลดคอมเมนต์ใหม่หลังแก้ไข
+          this.loadComments(); 
           this.stopEdit();
         },
         (error) => {

@@ -5,11 +5,11 @@
 
       <!-- ✅ Cover Image -->
       <div class="relative w-full h-56 bg-gray-200 rounded-t-lg overflow-hidden">
-        <img [src]="userData?.coverImage || 'default-cover.png'" 
-             alt="Cover Image" 
-             class="w-full h-full object-cover" />
+        <img [src]="userData?.coverImage || 'default-cover.png'" alt="Cover Image" class="w-full h-full object-cover" />
+
+        <!-- ✅ ปรับตำแหน่ง และ z-index -->
         <label *ngIf="isOwner && isEditing"
-          class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-3 py-1 text-xs rounded cursor-pointer hover:bg-opacity-70 transition">
+          class="absolute bottom-2 right-2 z-10 bg-black bg-opacity-50 text-white px-3 py-1 text-xs rounded cursor-pointer hover:bg-opacity-70 transition">
           ✏️ เปลี่ยน Cover
           <input type="file" (change)="onCoverImageChange($event)" class="hidden">
         </label>
@@ -18,8 +18,8 @@
       <!-- ✅ Profile Image -->
       <div class="relative text-center -mt-14">
         <div class="relative inline-block">
-          <img [src]="userData?.imageProfile || 'default-profile.png'" 
-               class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md" />
+          <img [src]="userData?.imageProfile || 'default-profile.png'"
+            class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md" />
           <label *ngIf="isOwner && isEditing"
             class="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white px-2 py-1 text-xs rounded cursor-pointer hover:bg-opacity-70 transition">
             ✏️
@@ -78,12 +78,11 @@
           class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
           💾 บันทึก
         </button>
-        <button *ngIf="!isEditing" (click)="toggleEditMode()"
+        <button *ngIf="!isEditing && isOwner" (click)="toggleEditMode()"
           class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
           ✏️ แก้ไขโปรไฟล์
         </button>
-        <button (click)="goToHome()"
-          class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+        <button (click)="goToHome()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
           ⬅️ กลับ
         </button>
       </div>

@@ -5,10 +5,14 @@ import com.kku.testapi.dto.NotificationRequestDto;
 import com.kku.testapi.entity.User;
 import com.kku.testapi.service.UserService;
 
+import net.coobird.thumbnailator.Thumbnails;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,8 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kku.testapi.repository.UserRepository;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.*;
+
+import java.awt.image.BufferedImage;
+import java.io.*;
 
 @RestController
 @RequestMapping("/users")
@@ -186,17 +192,22 @@ public class UserController {
                 uploadDir.mkdirs();
             }
 
-            String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String filename = "profile_" + userId + "_" + UUID.randomUUID() + extension;
-            Path path = Paths.get(UPLOAD_DIR, filename);
+            // ✅ ลดขนาดรูปภาพ (ปรับขนาดเป็น 256x256)
+            BufferedImage originalImage = ImageIO.read(file.getInputStream());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Thumbnails.of(originalImage)
+                    .size(256, 256) // กำหนดขนาดที่ต้องการ
+                    .outputQuality(0.8) // ลดคุณภาพของรูป (0.0 - 1.0)
+                    .outputFormat("jpg") // บันทึกเป็น JPG เพื่อลดขนาดไฟล์
+                    .toOutputStream(baos);
 
-            Files.write(path, file.getBytes());
+            String filename = "profile_" + userId + "_" + UUID.randomUUID() + ".jpg";
+            Path path = Paths.get(UPLOAD_DIR, filename);
+            Files.write(path, baos.toByteArray());
 
             String filePath = "/assets/" + filename;
             userService.updateProfileImage(userId, filePath);
 
-            // ✅ ส่ง JSON Response กลับไป
             response.put("message", "Upload successful");
             response.put("filePath", filePath);
             return ResponseEntity.ok(response);
@@ -223,17 +234,22 @@ public class UserController {
                 uploadDir.mkdirs();
             }
 
-            String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String filename = "cover_" + userId + "_" + UUID.randomUUID() + extension;
-            Path path = Paths.get(UPLOAD_DIR, filename);
+            // ✅ ลดขนาดรูปภาพ (ปรับขนาดเป็น 1280x720)
+            BufferedImage originalImage = ImageIO.read(file.getInputStream());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Thumbnails.of(originalImage)
+                    .size(1280, 720) // กำหนดขนาด Cover Image
+                    .outputQuality(0.8) // ลดคุณภาพของรูป (0.0 - 1.0)
+                    .outputFormat("jpg") // บันทึกเป็น JPG
+                    .toOutputStream(baos);
 
-            Files.write(path, file.getBytes());
+            String filename = "cover_" + userId + "_" + UUID.randomUUID() + ".jpg";
+            Path path = Paths.get(UPLOAD_DIR, filename);
+            Files.write(path, baos.toByteArray());
 
             String filePath = "/assets/" + filename;
             userService.updateCoverImage(userId, filePath);
 
-            // ✅ ส่ง JSON Response กลับไป
             response.put("message", "Upload successful");
             response.put("filePath", filePath);
             return ResponseEntity.ok(response);
@@ -243,4 +259,5 @@ public class UserController {
             return ResponseEntity.status(500).body(response);
         }
     }
+
 }

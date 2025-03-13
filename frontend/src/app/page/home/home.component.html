@@ -8,6 +8,14 @@
         <!-- Left Column (col-span-3): Friend Requests & Friends List -->
         <div class="col-span-12 lg:col-span-3 space-y-4">
 
+            <!-- Profile Card -->
+            <div class="bg-white shadow rounded-lg p-4 flex flex-col items-center cursor-pointer hover:bg-gray-100 transition"
+                (click)="goToUserDetail(loggedInUserId)">
+                <img [src]="userProfile.imageProfile || 'default-profile.png'" alt="Profile Image"
+                    class="w-20 h-20 object-cover rounded-full border border-gray-300 shadow-sm">
+                <h2 class="text-lg font-semibold text-gray-800 mt-2">{{ userProfile.username }}</h2>
+            </div>
+
             <!-- Friend Requests -->
             <div class="bg-white shadow rounded-lg p-4">
                 <h2 class="text-lg font-bold text-gray-700 mb-2">Friend Requests</h2>
@@ -80,7 +88,7 @@
 
         <!-- Right Column (col-span-3): All Users -->
         <div class="col-span-12 lg:col-span-4 space-y-4">
-            
+
             <div class="space-y-4 bg-white shadow rounded-lg p-4">
                 <h2 class="text-2xl font-bold text-indigo-600 text-center">All Users</h2>
                 <div *ngFor="let user of users"

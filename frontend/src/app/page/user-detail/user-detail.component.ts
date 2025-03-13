@@ -61,12 +61,11 @@ export class UserDetailComponent implements OnInit {
   toggleEditMode(): void {
     if (!this.isOwner) return;
     this.isEditing = !this.isEditing;
-
+    console.log("📌 isEditing:", this.isEditing);
+  
     if (this.isEditing) {
-      // ✅ คัดลอกค่าปัจจุบันไปที่ editData
       this.editData = { ...this.userData };
     } else {
-      // ✅ รีเซ็ตค่าถ้ากดยกเลิก
       this.selectedProfileImage = null;
       this.selectedCoverImage = null;
     }

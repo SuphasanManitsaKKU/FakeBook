@@ -30,18 +30,21 @@ public class NotificationServiceAction implements NotificationService {
         notification.setReceiver(receiver);
         notification.setType(type);
         notification.setContentId(contentId);
-        notification.setStatus((byte) 0); // กำหนดสถานะการแจ้งเตือนว่าไม่ได้รับการดู (0)
+        notification.setStatus((byte) 0); // กำหนดสถานะเริ่มต้นเป็น 0 (ยังไม่อ่าน)
 
-        // บันทึกการแจ้งเตือนในฐานข้อมูล
-        notificationRepository.save(notification);
+        // ✅ บันทึกการแจ้งเตือนลงในฐานข้อมูล และให้ JPA กำหนด ID อัตโนมัติ
+        Notification savedNotification = notificationRepository.save(notification);
 
-        // ส่งข้อความผ่าน WebSocket หรือช่องทางอื่นๆ
+        // ✅ สร้าง DTO และใส่ notificationId ที่ได้จากฐานข้อมูล
         NotificationRequestDto notificationRequest = new NotificationRequestDto();
         notificationRequest.setUserId(receiver.getId().toString());
+        notificationRequest.setNotificationId(savedNotification.getId()); // ✅ ใส่ notificationId
         notificationRequest.setMessage(message);
-        notificationRequest.setType(type.name()); // ตั้งค่า type ด้วย NotificationType
+        notificationRequest.setType(type.name());
         notificationRequest.setContentId(contentId);
+        notificationRequest.setStatus((byte) 0); // ✅ ใส่ค่า status 0 (ยังไม่อ่าน)
 
+        // ✅ ส่งข้อความผ่าน WebSocket พร้อมกับ notificationId
         messagingTemplate.convertAndSend("/notification/messages/" + receiver.getId(), notificationRequest);
     }
 
@@ -71,7 +74,7 @@ public class NotificationServiceAction implements NotificationService {
 
     public List<NotificationRequestDto> getNotificationsByUserId(Integer userId) {
         List<Notification> notifications = notificationRepository.findByReceiverIdOrderByIdDesc(userId);
-    
+
         return notifications.stream().map(notification -> {
             NotificationRequestDto dto = new NotificationRequestDto();
             dto.setNotificationId(notification.getId()); // ✅ เพิ่ม notificationId

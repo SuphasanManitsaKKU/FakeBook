@@ -58,10 +58,6 @@
                 </div>
 
                 <div class="flex space-x-4 mt-2 text-xs text-gray-500">
-                  <button *ngIf="getCommentDepth(comment2) < 3" class="hover:underline"
-                    (click)="startReply(comment2.id)">
-                    Reply
-                  </button>
                   <button *ngIf="comment2.user.id == userId && editingCommentId !== comment2.id"
                     class="text-yellow-500 hover:underline" (click)="startEdit(comment2)">
                     Edit
@@ -72,41 +68,6 @@
                   </button>
                 </div>
               </div>
-            </div>
-
-            <!-- ✅ แสดง Replies (ระดับ 3) -->
-            <div *ngIf="repliesMap[comment2.id]" class="flex flex-col gap-6 pl-10 border-l-4 border-gray-300">
-              <ng-container *ngFor="let comment3 of repliesMap[comment2.id]">
-                <div class="flex items-start space-x-3 bg-gray-200 p-4 rounded-xl shadow-md">
-                  <img [src]="comment3.user.imageProfile ? comment3.user.imageProfile : 'default-profile.png'"
-                    alt="Profile Image" class="w-8 h-8 rounded-full object-cover" />
-
-                  <div class="w-full">
-                    <p class="text-sm font-semibold text-gray-900">{{ comment3.user.username }}</p>
-                    <p *ngIf="editingCommentId !== comment3.id" class="text-gray-700 text-sm">{{ comment3.message }}</p>
-
-                    <div *ngIf="editingCommentId == comment3.id">
-                      <input type="text" [(ngModel)]="editedMessage" class="w-full p-2 border rounded-lg" />
-                      <div class="mt-2 flex space-x-2">
-                        <button class="bg-green-500 text-white py-1 px-3 rounded-md"
-                          (click)="saveEdit(comment3)">Save</button>
-                        <button class="text-gray-500" (click)="stopEdit()">Cancel</button>
-                      </div>
-                    </div>
-
-                    <div class="flex space-x-4 mt-2 text-xs text-gray-500">
-                      <button *ngIf="comment3.user.id == userId && editingCommentId !== comment3.id"
-                        class="text-yellow-500 hover:underline" (click)="startEdit(comment3)">
-                        Edit
-                      </button>
-                      <button *ngIf="comment3.user.id == userId" class="text-red-500 hover:underline"
-                        (click)="deleteComment(comment3.id)">
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </ng-container>
             </div>
           </ng-container>
         </div>

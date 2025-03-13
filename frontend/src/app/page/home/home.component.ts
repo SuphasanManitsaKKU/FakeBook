@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit {
   users: User[] = [];                    // ✅ รายชื่อผู้ใช้ทั้งหมด
   loggedInUserId: number = 0;
   pendingRequests: number[] = [];        // ✅ คำขอที่เราส่งไปแล้ว
+  userProfile: User = {} as User;  // ✅ เก็บข้อมูลผู้ใช้ที่ล็อกอิน
 
   constructor(
     private friendService: FriendService,
@@ -31,6 +32,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loggedInUserId = this.userPublicService.getUserId();
+    this.loadUserProfile();
     this.loadAllUsers();
     this.loadFriends();
     this.loadPendingRequests();
@@ -134,4 +136,16 @@ export class HomeComponent implements OnInit {
   goToUserDetail(userId: number) {
     this.router.navigate(['/user', userId]);
   }
+
+
+/** ✅ โหลดข้อมูลโปรไฟล์ของผู้ใช้ที่ล็อกอิน */
+loadUserProfile(): void {
+  if (!this.loggedInUserId) return;
+  this.userService.getUserById(this.loggedInUserId).subscribe({
+      next: (user) => {
+          this.userProfile = user;
+      },
+      error: (err) => console.error('โหลดข้อมูลโปรไฟล์ล้มเหลว:', err)
+  });
+}
 }

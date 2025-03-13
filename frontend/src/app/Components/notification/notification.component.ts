@@ -76,7 +76,7 @@ export class NotificationComponent implements OnInit {
                             return;
                         }
 
-                        this.messages.push({
+                        this.messages.unshift({
                             userId: parsedMessage.userId || '',
                             notificationId: parsedMessage.notificationId || 0,
                             message: parsedMessage.message || 'No message content',
@@ -109,25 +109,23 @@ export class NotificationComponent implements OnInit {
     navigateToMessageDetail(contentId: string, notificationId: number, index: number): void {
         console.log("🔍 Navigating to message detail:", notificationId);
 
-        // ✅ เรียก API เพื่ออัปเดตสถานะเป็น "อ่านแล้ว"
+        // ตรวจสอบว่า notificationId เป็นค่าที่ถูกต้องก่อนเรียก API
+        if (!notificationId || notificationId <= 0) {
+            console.error("❌ Invalid notificationId:", notificationId);
+            return;
+        }
+
         this.notificationService.markAsRead(notificationId).subscribe({
             next: () => {
                 console.log("✅ Marked as read:", notificationId);
-
-                // ✅ อัปเดตสถานะของ notification เป็น "อ่านแล้ว"
                 this.messages[index].status = 1;
-
-                // ✅ บังคับให้ Angular รู้ว่ามีการเปลี่ยนแปลง
                 this.messages = [...this.messages];
-
-                // ✅ คำนวณจำนวน unread ใหม่
                 this.unreadCount = this.messages.filter(m => m.status == 0).length;
-
                 console.log("📌 Updated unread count:", this.unreadCount);
             },
             error: (err) => console.error("❌ Error marking as read:", err),
         });
 
-        this.router.navigate(['/post', contentId]); // ✅ ไปยังหน้ารายละเอียดโพสต์
+        this.router.navigate(['/post', contentId]);
     }
 }

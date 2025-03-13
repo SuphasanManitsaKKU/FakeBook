@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';  // ✅ Import Subscription
 
 import { NotificationComponent } from '../notification/notification.component';
 import { LogoutComponent } from '../logout/logout.component';
@@ -12,7 +13,7 @@ import { UserService } from '../../services/auth/user/user.service';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCommentDots } from '@fortawesome/free-solid-svg-icons';
-// ↑ Inject UserService เพื่อเรียก getUserById()
+import { User } from '../../type';
 
 @Component({
   selector: 'app-navbar',
@@ -28,14 +29,11 @@ import { faCommentDots } from '@fortawesome/free-solid-svg-icons';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {  // ✅ Implement OnDestroy
   faCommentDots = faCommentDots;
-
-  // ควบคุมการเปิด/ปิดเมนูของโปรไฟล์
   isProfileMenuOpen = false;
-
-  // ⭐ เก็บข้อมูลผู้ใช้ (ถ้ามี interface User ก็ใช้ User | null)
-  userData: any = null;
+  userData: User | undefined;
+  private userSubscription!: Subscription;  // ✅ ใช้ Subscription เพื่อ unsubscribe ภายหลัง
 
   constructor(
     private router: Router,
@@ -44,31 +42,37 @@ export class NavbarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // 1) ดึง userId จาก UserPublicService (หรือจะใช้ token ตรวจจับอื่นๆ ตามโปรเจกต์)
+    // ✅ Subscribe เพื่อติดตามการเปลี่ยนแปลงของ userId
+    this.userSubscription = this.userPublicService.getUserIdObservable().subscribe(userId => {
+      if (userId) {
+        console.log("✅ userId เปลี่ยน:", userId);
+        this.fetchUserData(userId);
+      }
+    });
+
+    // ✅ โหลดข้อมูลเริ่มต้น
     const userId = this.userPublicService.getUserId();
-    
-    // 2) ถ้ามี userId ก็เรียก getUserById เพื่อโหลดข้อมูลผู้ใช้ (รวมถึงรูปโปรไฟล์)
     if (userId) {
-      this.userService.getUserById(userId).subscribe({
-        next: (res) => {
-          this.userData = res;  // เก็บข้อมูลผู้ใช้
-          console.log('ข้อมูล user', this.userData);
-        },
-        error: (err) => {
-          console.error('เกิดข้อผิดพลาดขณะดึงข้อมูลผู้ใช้', err);
-        }
-      });
+      this.fetchUserData(userId);
     }
+  }
+
+  /** ✅ ฟังก์ชันโหลดข้อมูลผู้ใช้ */
+  private fetchUserData(userId: number): void {
+    this.userService.getUserById(userId).subscribe({
+      next: (res) => {
+        this.userData = res;
+        console.log('✅ โหลดข้อมูล user สำเร็จ:', this.userData);
+      },
+      error: (err) => console.error('❌ โหลดข้อมูล user ล้มเหลว:', err)
+    });
   }
 
   toggleProfileMenu() {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
-  /** กดดูโปรไฟล์ => ไปหน้า /user-detail/[id] */
   goToProfile() {
-    console.log('ไปหน้าโปรไฟล์');
-    
     this.isProfileMenuOpen = false;
     const userId = this.userPublicService.getUserId();
     if (userId) {
@@ -77,11 +81,17 @@ export class NavbarComponent implements OnInit {
   }
 
   goToHome() {
-    this.router.navigate(['/']);  // ✅ นำทางไปหน้า Home
+    this.router.navigate(['/']);
   }
 
   goToChat() {
-    this.router.navigate(['/chat']);  // ✅ ไปที่หน้าแชท
-  }  
-  
+    this.router.navigate(['/chat']);
+  }
+
+  /** ✅ Unsubscribe เมื่อ Component ถูกทำลาย */
+  ngOnDestroy(): void {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
 }

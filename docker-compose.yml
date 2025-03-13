@@ -38,6 +38,8 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       retries: 5
+    volumes:
+      - mysql_data:/var/lib/mysql  # ✅ เพิ่ม Volume สำหรับเก็บข้อมูล
 
   nginx:
     image: nginx:latest
@@ -55,3 +57,7 @@ services:
 networks:
   default:
     driver: bridge
+
+volumes:
+  mysql_data:  # ✅ กำหนด volume สำหรับ MySQL เพื่อเก็บข้อมูล
+    driver: local
