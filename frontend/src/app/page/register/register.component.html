@@ -21,7 +21,7 @@
             <div class="relative">
                 <label class="block text-sm font-medium text-gray-600">Email</label>
                 <div class="relative">
-                    <span class="absolute top-[30%] left-3 flex items-center text-gray-400">
+                    <span class="absolute top-3 left-3 flex items-center text-gray-400">
                         <fa-icon [icon]="faEnvelope"></fa-icon>
                     </span>
                     <input type="email" [(ngModel)]="email" name="email" placeholder="e.g., johndoe@example.com"
@@ -38,9 +38,13 @@
                     <span class="absolute top-3 left-3 flex items-center text-gray-400">
                         <fa-icon [icon]="faLock"></fa-icon>
                     </span>
-                    <input type="password" [(ngModel)]="password" name="password"
+                    <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password"
                         class="w-full px-10 py-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-blue-500"
                         required />
+                    <button type="button" (click)="togglePasswordVisibility('password')"
+                        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                        <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
+                    </button>
                 </div>
                 <!-- ✅ Password Strength Checker -->
                 <ul class="mt-2 text-sm">
@@ -74,11 +78,17 @@
                     <span class="absolute top-3 left-3 flex items-center text-gray-400">
                         <fa-icon [icon]="faLock"></fa-icon>
                     </span>
-                    <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword"
+                    <input [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword"
+                        name="confirmPassword"
                         class="w-full px-10 py-2 mt-1 border border-gray-300 rounded-md focus:ring focus:ring-blue-500"
                         required />
+                    <button type="button" (click)="togglePasswordVisibility('confirmPassword')"
+                        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                        <fa-icon [icon]="showConfirmPassword ? faEyeSlash : faEye"></fa-icon>
+                    </button>
                 </div>
-                <p *ngIf="!passwordsMatch && confirmPassword" class="text-red-500 text-sm mt-1">❌ Passwords do not match</p>
+                <p *ngIf="!passwordsMatch && confirmPassword" class="text-red-500 text-sm mt-1">❌ Passwords do not match
+                </p>
                 <p *ngIf="passwordsMatch && confirmPassword" class="text-green-500 text-sm mt-1">✅ Passwords match</p>
             </div>
 

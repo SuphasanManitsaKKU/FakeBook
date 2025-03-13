@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/auth/user/user.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faUser, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faUser, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-register',
@@ -16,6 +17,11 @@ export class RegisterComponent {
   faUser = faUser;
   faEnvelope = faEnvelope;
   faLock = faLock;
+  faEye = faEye;
+  faEyeSlash = faEyeSlash;
+
+  showPassword = false;
+  showConfirmPassword = false;
 
   username: string = '';
   email: string = '';
@@ -81,16 +87,36 @@ export class RegisterComponent {
     this.userService.register(this.username, this.email, this.password).subscribe(
       (response) => {
         console.log('Registration successful:', response);
+        Swal.fire({
+          icon: 'success',
+          title: 'Registration Successful',
+          text: 'You have successfully registered!',
+          showConfirmButton: false,
+          timer: 1500
+        });
         this.router.navigate(['/login']);
       },
       (error) => {
         console.error('Registration failed:', error);
         this.errorMessage = 'Registration failed. Please try again.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Registration Failed',
+          text: this.errorMessage
+        });
       }
     );
   }
 
   goToLogin(): void {
     this.router.navigate(['/login']);
+  }
+
+  togglePasswordVisibility(field: string) {
+    if (field === 'password') {
+      this.showPassword = !this.showPassword;
+    } else if (field === 'confirmPassword') {
+      this.showConfirmPassword = !this.showConfirmPassword;
+    }
   }
 }
